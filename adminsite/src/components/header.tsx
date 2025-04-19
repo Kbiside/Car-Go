@@ -12,6 +12,7 @@ import {
 } from '@mantine/core';
 import { IconBell, IconPlus } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
+import { notifications } from '@mantine/notifications';
 
 interface HeaderProps {
   onNavbarOpen: () => void;

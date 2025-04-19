@@ -1,4 +1,4 @@
-import { Navbar as MantineNavbar, NavLink, ScrollArea } from '@mantine/core';
+import { AppShell, NavLink, ScrollArea } from '@mantine/core';
 import {
   IconUsers,
   IconCar,
@@ -26,13 +26,12 @@ export function Navbar({ opened }: NavbarProps) {
   ];
 
   return (
-    <MantineNavbar
+    <AppShell.Navbar
       p="md"
-      hiddenBreakpoint="sm"
       hidden={!opened}
-      width={{ sm: 200, lg: 300 }}
+      style={{ display: opened ? 'block' : 'none' }}
     >
-      <MantineNavbar.Section grow component={ScrollArea}>
+      <ScrollArea>
         {navItems.map((item, index) => (
           <NavLink
             key={index}
@@ -41,7 +40,7 @@ export function Navbar({ opened }: NavbarProps) {
             onClick={() => navigate(item.path)}
           />
         ))}
-      </MantineNavbar.Section>
-    </MantineNavbar>
+      </ScrollArea>
+    </AppShell.Navbar>
   );
 }

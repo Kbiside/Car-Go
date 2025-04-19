@@ -19,6 +19,7 @@ import {
     Tooltip,
     Legend,
   } from 'chart.js';
+import { AppLayout } from '../components/AppLayout';
   
   // Регистрируем необходимые компоненты Chart.js
   ChartJS.register(
@@ -30,7 +31,6 @@ import {
     Tooltip,
     Legend
   );
-  
   export function DashboardPage() {
     // Пример данных (можете заменить своими)
     const dailyOrdersData = {
