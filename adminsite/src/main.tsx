@@ -8,6 +8,7 @@ import { theme } from "./theme.ts";
 import { DashboardPage } from "./pages/Dashboard.tsx";
 import AddCarPage from "./pages/AddCar.tsx";
 import CarProfile from "./pages/Car.tsx";
+import CreateRequest from "./pages/AddZaya2.tsx";
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <MantineProvider theme={theme}>
   <BrowserRouter>
@@ -16,6 +17,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
       <Route path="dashboard" element = {<DashboardPage/>}/>
       <Route path="add-car" element = {<AddCarPage/>}/>
       <Route path="car" element = {<CarProfile/>}/>
+      <Route path="create-request" element = {<CreateRequest/>}/>
     </Routes>
   </BrowserRouter>
   </MantineProvider>
