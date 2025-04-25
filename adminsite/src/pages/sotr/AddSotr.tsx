@@ -39,7 +39,7 @@ const AddEmployee = () => {
         <Textarea label="Загрузите документы об образовании" placeholder="Введите документы" required />
         <TextInput label="Временный пароль" placeholder="fhbs663dge97" required />
 
-        <Group position="right" mt="md">
+        <Group>
           <Button type="submit">Сохранить</Button>
           <Button type="button" variant="outline">Очистить</Button>
         </Group>
