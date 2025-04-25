@@ -12,6 +12,10 @@ import CarProfile from "./pages/car/Car.tsx";
 import { AppLayout } from "./components/AppLayout.tsx";
 import ClientsPage from "./pages/client/Client.tsx";
 import ClientProfile from "./pages/client/ProfileClient.tsx";
+import EmployeesPage from "./pages/sotr/sotr.tsx";
+import AddEmployee from "./pages/sotr/AddSotr.tsx";
+import VehiclesPage from "./pages/car/Vehicle.tsx";
+import ClientProfilePage from "./pages/client/ProfileClient.tsx";
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <MantineProvider theme={theme}>
   <BrowserRouter>
@@ -23,17 +27,20 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
         <Route path="clients">
           <Route index element={<ClientsPage />} />
           <Route path="add" element={<ClientAddPage />} />
-          <Route path=":id" element={<ClientProfile />} />
+          <Route path=":id" element={<ClientProfilePage />} />
         </Route>
         
         {/* Автопарк */}
         <Route path="cars">
-          <Route index element={<div>Список автомобилей</div>} /> {/* Замените на ваш компонент */}
+          <Route index element={<VehiclesPage />} /> {/* Замените на ваш компонент */}
           <Route path="add" element={<AddCarPage />} />
           <Route path=":id" element={<CarProfile />} />
         </Route>
         
-        
+        <Route path="employees">
+          <Route index element={<EmployeesPage />} /> {/* Замените на ваш компонент */}
+          <Route path="add" element={<AddEmployee />} />
+        </Route>
         {/* Резервные маршруты */}
         <Route path="/" element={<DashboardPage />} />
         <Route path="*" element={<div>404 Not Found</div>} />

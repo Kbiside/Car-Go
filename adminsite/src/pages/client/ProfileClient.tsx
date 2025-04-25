@@ -6,52 +6,84 @@ import {
   Group, 
   Stack, 
   Container,
-  Paper
+  Paper,
+  Box,
+  Anchor,
+  ActionIcon,
+  Modal,
+  Image
 } from '@mantine/core';
-import { IconEdit, IconPlus } from '@tabler/icons-react';
+import { IconEdit, IconLicense, IconId, IconDownload } from '@tabler/icons-react';
+import { useState } from 'react';
 
 export default function ClientProfilePage() {
-  // Данные клиента (в реальном приложении будут приходить из API)
+  const [openedDoc, setOpenedDoc] = useState<string | null>(null);
+  
+  // Данные клиента (включая комментарий)
   const clientData = {
     fullName: 'Смирнова Анна Сергеевна',
     clientId: 'ID 937601',
     phone: '89510833438',
     birthDate: '16.07.1989',
+    comment: 'Клиент предпочитает электромобили. Важный клиент с 2015 года.'
   };
 
   // Данные документов
   const documents = [
     {
       type: 'Паспорт',
+      icon: <IconId size="1.2rem" />,
       number: '1234 567890',
       issueDate: '23.08.2011',
-      comment: '-'
+      previewUrl: '/api/documents/passport-preview.jpg',
+      fileUrl: '/api/documents/passport.pdf'
     },
     {
       type: 'Водительское удостоверение',
+      icon: <IconLicense size="1.2rem" />,
       number: 'ВУ 123456',
       issueDate: '15.05.2015',
-      comment: 'Предпочитает электромобили'
+      previewUrl: '/api/documents/license-preview.jpg',
+      fileUrl: '/api/documents/license.pdf'
     },
   ];
 
+  const handleViewDoc = (docType: string) => {
+    setOpenedDoc(docType);
+  };
+
+  const handleDownloadDoc = (docType: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    console.log(`Скачивание ${docType}`);
+    const link = document.createElement('a');
+    link.href = `#${docType.toLowerCase().replace(' ', '-')}`;
+    link.download = `${docType}_${clientData.fullName}.pdf`;
+    link.click();
+  };
+
   return (
     <Container size="lg" py="md">
-      <Stack gap="xl">
-        {/* Заголовок и кнопка добавления */}
-        <Group justify="space-between" align="flex-start">
-          <Title order={1} ta="center" style={{ flex: 1 }}>
-            Профиль клиента
-          </Title>
-          <Button 
-            leftSection={<IconPlus size="1rem" />}
-            variant="filled"
-          >
-            Добавить заявку
-          </Button>
-        </Group>
+      <Modal
+        opened={openedDoc !== null}
+        onClose={() => setOpenedDoc(null)}
+        title={`Просмотр документа: ${openedDoc}`}
+        size="xl"
+      >
+        {openedDoc && (
+          <Image
+            src={documents.find(d => d.type === openedDoc)?.previewUrl}
+            alt={`Превью ${openedDoc}`}
+            fit="contain"
+            style={{ maxHeight: '70vh' }}
+          />
+        )}
+      </Modal>
 
-        {/* Информация о клиенте */}
+      <Stack gap="xl">
+        <Title order={1} ta="center">
+          Профиль клиента
+        </Title>
+
         <Paper p="md" shadow="sm" radius="md">
           <Stack gap="xs" align="center">
             <Text size="xl" fw={500}>
@@ -69,40 +101,67 @@ export default function ClientProfilePage() {
           </Stack>
         </Paper>
 
-        {/* Таблица документов */}
-        <div>
+        <Box>
           <Title order={2} mb="sm">
             Документы клиента
           </Title>
-          <Table striped highlightOnHover>
-            <thead>
-              <tr>
-                <th>Тип документа</th>
-                <th>Серия и номер</th>
-                <th>Дата выдачи</th>
-                <th>Комментарии</th>
-              </tr>
-            </thead>
-            <tbody>
-              {documents.map((doc, index) => (
-                <tr key={index}>
-                  <td>{doc.type}</td>
-                  <td>{doc.number}</td>
-                  <td>{doc.issueDate}</td>
-                  <td>{doc.comment}</td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        </div>
-
-        {/* Кнопка редактирования */}
-        <Group justify="flex-end">
-          <Button 
-            leftSection={<IconEdit size="1rem" />}
-            variant="outline"
+          
+          <Table
+            striped
+            highlightOnHover
+            withColumnBorders
+            horizontalSpacing="md"
+            verticalSpacing="sm"
           >
-            Редактировать
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th style={{ width: '40px' }}></Table.Th>
+                <Table.Th>Тип документа</Table.Th>
+                <Table.Th>Серия и номер</Table.Th>
+                <Table.Th>Дата выдачи</Table.Th>
+                <Table.Th style={{ width: '60px' }}></Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {documents.map((doc, index) => (
+                <Table.Tr key={index} style={{ cursor: 'pointer' }} onClick={() => handleViewDoc(doc.type)}>
+                  <Table.Td>{doc.icon}</Table.Td>
+                  <Table.Td>
+                    <Anchor component="span" c="blue" underline="hover">
+                      {doc.type}
+                    </Anchor>
+                  </Table.Td>
+                  <Table.Td>{doc.number}</Table.Td>
+                  <Table.Td>{doc.issueDate}</Table.Td>
+                  <Table.Td>
+                    <ActionIcon 
+                      variant="subtle" 
+                      color="green"
+                      onClick={(e) => handleDownloadDoc(doc.type, e)}
+                      title="Скачать документ"
+                    >
+                      <IconDownload size="1rem" />
+                    </ActionIcon>
+                  </Table.Td>
+                </Table.Tr>
+              ))}
+            </Table.Tbody>
+          </Table>
+        </Box>
+
+        {/* Блок комментариев (только для чтения) */}
+        <Paper p="md" shadow="sm" radius="md">
+          <Title order={3} mb="sm">
+            Комментарии о клиенте
+          </Title>
+          <Text size="md" style={{ whiteSpace: 'pre-wrap' }}>
+            {clientData.comment}
+          </Text>
+        </Paper>
+
+        <Group justify="flex-end">
+          <Button leftSection={<IconEdit size="1rem" />} variant="outline">
+            Редактировать профиль
           </Button>
         </Group>
       </Stack>
