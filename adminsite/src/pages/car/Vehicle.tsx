@@ -98,18 +98,11 @@ const VehiclesPage = () => {
   });
 
   const filteredVehicles = sortedVehicles.filter(vehicle => {
-    // Фильтрация по поисковому запросу
     const matchesSearch = `${vehicle.brand} ${vehicle.model} ${vehicle.licensePlate}`
       .toLowerCase()
       .includes(search.toLowerCase());
-    
-    // Фильтрация по брендам
     const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(vehicle.brand);
-    
-    // Фильтрация по категориям
     const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(vehicle.category);
-    
-    // Фильтрация по годам
     const matchesYear = selectedYears.length === 0 || selectedYears.includes(vehicle.year.toString());
     
     return matchesSearch && matchesBrand && matchesCategory && matchesYear;
@@ -121,7 +114,11 @@ const VehiclesPage = () => {
   );
 
   const handleVehicleClick = (vehicleId: number) => {
-    navigate(`/vehicles/${vehicleId}`);
+    navigate(`/cars/${vehicleId}`); // Изменено на /cars/:id
+  };
+
+  const handleAddVehicle = () => {
+    navigate('/cars/add'); // Изменено на /cars/add
   };
 
   const resetFilters = () => {
@@ -129,25 +126,15 @@ const VehiclesPage = () => {
     setSelectedCategories([]);
     setSelectedYears([]);
     setSearch('');
+    setFiltersOpened(false);
   };
 
   const hasFilters = selectedBrands.length > 0 || selectedCategories.length > 0 || selectedYears.length > 0 || search;
-
   const activeFiltersCount = selectedBrands.length + selectedCategories.length + selectedYears.length;
 
-  const SortableHeader = ({ 
-    field, 
-    children 
-  }: {
-    field: SortField;
-    children: React.ReactNode;
-  }) => (
+  const SortableHeader = ({ field, children }: { field: SortField; children: React.ReactNode; }) => (
     <Table.Th 
-      style={{ 
-        cursor: 'pointer',
-        paddingLeft: rem(16),
-        paddingRight: rem(16)
-      }}
+      style={{ cursor: 'pointer', paddingLeft: rem(16), paddingRight: rem(16) }}
       onClick={() => handleSort(field)}
     >
       <Group gap={4} wrap="nowrap">
@@ -174,7 +161,7 @@ const VehiclesPage = () => {
           <Title order={2}>Автопарк</Title>
           <Button 
             leftSection={<IconPlus size="1rem" />}
-            onClick={() => navigate('/vehicles/add')}
+            onClick={handleAddVehicle} // Используем новую функцию
             variant="filled"
           >
             Добавить автомобиль
@@ -187,7 +174,6 @@ const VehiclesPage = () => {
             value={search}
             onChange={(event) => setSearch(event.currentTarget.value)}
             style={{ flex: 1 }}
-            leftSection={<IconFilter size="1rem" />}
           />
           
           <Menu 
@@ -195,12 +181,15 @@ const VehiclesPage = () => {
             width={300}
             opened={filtersOpened}
             onChange={setFiltersOpened}
+            closeOnClickOutside={false}
+            closeOnItemClick={false}
           >
             <Menu.Target>
               <Button 
                 variant={hasFilters ? 'light' : 'outline'}
                 leftSection={<IconFilter size="1rem" />}
                 rightSection={<IconChevronDown size="1rem" />}
+                onClick={() => setFiltersOpened((o) => !o)}
               >
                 Фильтры
                 {activeFiltersCount > 0 && (
@@ -215,7 +204,7 @@ const VehiclesPage = () => {
               <Menu.Label>Бренд</Menu.Label>
               <Box px="sm" mih={150} style={{ overflowY: 'auto' }}>
                 {allBrands.map(brand => (
-                  <Menu.Item key={brand} p={0}>
+                  <Menu.Item key={brand} p={0} closeMenuOnClick={false}>
                     <Checkbox
                       label={brand}
                       checked={selectedBrands.includes(brand)}
@@ -238,7 +227,7 @@ const VehiclesPage = () => {
               <Menu.Label>Категория</Menu.Label>
               <Box px="sm" mih={120} style={{ overflowY: 'auto' }}>
                 {allCategories.map(category => (
-                  <Menu.Item key={category} p={0}>
+                  <Menu.Item key={category} p={0} closeMenuOnClick={false}>
                     <Checkbox
                       label={category}
                       checked={selectedCategories.includes(category)}
@@ -249,8 +238,8 @@ const VehiclesPage = () => {
                             : [...prev, category]
                         )
                       }
-                      w="100%"py="xs"
-                    />
+                      w="100%"
+                      py="xs"/>
                   </Menu.Item>
                 ))}
               </Box>
@@ -260,7 +249,7 @@ const VehiclesPage = () => {
               <Menu.Label>Год выпуска</Menu.Label>
               <Box px="sm" mih={120} style={{ overflowY: 'auto' }}>
                 {allYears.map(year => (
-                  <Menu.Item key={year} p={0}>
+                  <Menu.Item key={year} p={0} closeMenuOnClick={false}>
                     <Checkbox
                       label={year}
                       checked={selectedYears.includes(year)}
@@ -284,6 +273,7 @@ const VehiclesPage = () => {
                 onClick={resetFilters}
                 disabled={!hasFilters}
                 leftSection={<IconX size="1rem" />}
+                closeMenuOnClick={true}
               >
                 Сбросить все фильтры
               </Menu.Item>
@@ -351,7 +341,8 @@ const VehiclesPage = () => {
             )}
           </Table.Tbody>
         </Table>
-{filteredVehicles.length > 0 && (
+
+        {filteredVehicles.length > 0 && (
           <Center mt="md">
             <Pagination
               total={Math.ceil(filteredVehicles.length / itemsPerPage)}

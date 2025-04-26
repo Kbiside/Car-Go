@@ -81,8 +81,8 @@ const EmployeesPage = () => {
     activePage * itemsPerPage
   );
 
-  const handleEmployeeClick = (employeeId: number) => {
-    navigate(`/employees/${employeeId}`);
+  const handleClientClick = (clientId: number) => {
+    navigate(`/clients/${clientId}`);
   };
 
   const SortableHeader = ({ 
@@ -120,24 +120,24 @@ const EmployeesPage = () => {
       <Box pos="relative">
         <LoadingOverlay visible={loading} overlayProps={{ blur: 2 }} />
 
-        <Group justify="space-between" mb="md" align="center">
+        <Group justify="space-between" mb="sm" align="center">
           <Title order={2}>Сотрудники</Title>
-          <Group>
-            <TextInput
-              placeholder="Поиск сотрудника"
-              value={search}
-              onChange={(event) => setSearch(event.currentTarget.value)}
-              style={{ width: 300 }}
-            />
-            <Button 
-              leftSection={<IconPlus size="1rem" />}
-              onClick={() => navigate('/employees/add')}
-              variant="filled"
-            >
-              Добавить сотрудника
-            </Button>
-          </Group>
+          <Button 
+            leftSection={<IconPlus size="1rem" />}
+            onClick={() => navigate('/employees/add')}
+            variant="filled"
+          >
+            Добавить сотрудника
+          </Button>
         </Group>
+
+        <TextInput
+          placeholder="Поиск сотрудника"
+          value={search}
+          onChange={(event) => setSearch(event.currentTarget.value)}
+          mb="md"
+          w="100%"
+        />
 
         <Table
           striped
@@ -147,7 +147,7 @@ const EmployeesPage = () => {
           verticalSpacing="sm"
         >
           <colgroup>
-            <col style={{ width: rem(80)}} />
+            <col style={{ width: rem(80) }} />
             <col style={{ width: rem(250) }} />
             <col style={{ width: rem(180) }} />
             <col style={{ width: rem(200) }} />
@@ -175,7 +175,7 @@ const EmployeesPage = () => {
                     <Anchor
                       component="button"
                       type="button"
-                      onClick={() => handleEmployeeClick(employee.id)}
+                      onClick={() => handleClientClick(employee.id)}
                       c="blue"
                       underline="never"
                     >

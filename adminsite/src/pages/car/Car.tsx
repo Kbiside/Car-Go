@@ -3,22 +3,22 @@ import {
   Button,
   Stack,
   Title,
-  FileInput,
   Group,
   Container,
   Paper,
-  Grid,
   Text,
-  Divider,
-  Avatar,
   Badge,
-  Flex,
-  Box
+  Box,
+  ActionIcon,
+  Modal
 } from '@mantine/core';
-import { IconUpload, IconPhoto, IconCar, IconTrash, IconCheck } from '@tabler/icons-react';
+import { IconDownload, IconCar, IconEdit, IconPhoto } from '@tabler/icons-react';
+import { useState } from 'react';
 
 const CarProfilePage = () => {
-  // Данные автомобиля (в реальном приложении будут из API)
+  const [openedPhoto, setOpenedPhoto] = useState(false);
+  
+  // Данные автомобиля
   const carData = {
     id: 'CAR-2023-056',
     brand: 'Toyota',
@@ -28,156 +28,148 @@ const CarProfilePage = () => {
     vin: 'JT2BF22K2W0158759',
     color: 'Серебристый',
     status: 'Доступен',
-    comment: 'Пробег 15 000 км. Состояние отличное.'
+    comment: 'Пробег 15 000 км. Состояние отличное.',
+    photoUrl: 'https://example.com/car-photo.jpg', // URL фото автомобиля
+    documents: [
+      { type: 'Паспорт ТС', number: '78ОК123456', date: '15.03.2022' },
+      { type: 'Страховой полис', number: 'СБ123456789', date: '20.01.2023' },
+      { type: 'Свидетельство о регистрации', number: '77AA123456', date: '10.03.2022' }
+    ]
+  };
+
+  const handleDownload = (docType: string) => {
+    console.log(`Скачивание ${docType}`);
+    // В реальном приложении здесь будет запрос к API для скачивания файла
   };
 
   return (
     <Container size="lg" py="md">
+      {/* Модальное окно для просмотра фото */}
+      <Modal
+        opened={openedPhoto}
+        onClose={() => setOpenedPhoto(false)}
+        title={`Фото автомобиля ${carData.brand} ${carData.model}`}
+        size="xl"
+      >
+        <Box style={{ display: 'flex', justifyContent: 'center' }}>
+          <img 
+            src={carData.photoUrl} 
+            alt={`Фото ${carData.brand} ${carData.model}`} 
+            style={{ maxWidth: '100%', maxHeight: '70vh', objectFit: 'contain' }}
+          />
+        </Box>
+      </Modal>
+
       <Stack gap="xl">
-        {/* Шапка с основной информацией */}
-        <Paper p="md" shadow="sm" radius="md">
-          <Group align="flex-start">
-            <Avatar size={120} radius="md" color="blue">
-              <IconCar size="2.5rem" />
-            </Avatar>
-            
-            <Box>
-              <Title order={2}>{carData.brand} {carData.model} {carData.year}</Title>
-              <Group mt="sm">
-                <Badge variant="light" color="green" size="lg">
-                  {carData.status}
-                </Badge>
-                <Text c="dimmed">ID: {carData.id}</Text>
-              </Group>
-              
-              <Group mt="md" gap="xl">
-                <div>
-                  <Text size="sm" c="dimmed">Гос. номер</Text>
-                  <Text fw={500}>{carData.plateNumber}</Text>
-                </div>
-                <div>
-                  <Text size="sm" c="dimmed">VIN</Text>
-                  <Text fw={500}>{carData.vin}</Text>
-                </div>
-                <div>
-                  <Text size="sm" c="dimmed">Цвет</Text>
-                  <Text fw={500}>{carData.color}</Text>
-                </div>
-              </Group>
-            </Box>
-          </Group>
-        </Paper>
+        {/* Заголовок и кнопка редактирования */}
+        <Group justify="space-between" align="center">
+          <Title order={2}>Профиль автомобиля</Title>
+          <Button 
+            leftSection={<IconEdit size="1rem" />}
+            variant="outline"
+          >
+            Редактировать
+          </Button>
+        </Group>
 
         {/* Основная информация */}
-        <Grid>
-          <Grid.Col span={{ base: 12, md: 6 }}>
-            <Paper p="md" shadow="sm" radius="md" h="100%">
-              <Title order={4} mb="md">Основные данные</Title>
-              <Stack gap="sm">
-                <TextInput 
-                  label="Марка" 
-                  value={carData.brand} 
-                  readOnly
-                />
-                <TextInput 
-                  label="Модель" 
-                  value={carData.model} 
-                  readOnly
-                />
-                <TextInput 
-                  label="Год выпуска" 
-                  value={carData.year.toString()} 
-                  readOnly
-                />
-                <TextInput 
-                  label="Гос. номер" 
-                  value={carData.plateNumber} 
-                  readOnly
-                />
-              </Stack>
-            </Paper>
-          </Grid.Col>
-          
-          <Grid.Col span={{ base: 12, md: 6 }}>
-            <Paper p="md" shadow="sm" radius="md" h="100%">
-              <Title order={4} mb="md">Технические данные</Title>
-              <Stack gap="sm">
-                <TextInput 
-                  label="VIN номер" 
-                  value={carData.vin} 
-                  readOnly
-                />
-                <TextInput 
-                  label="Цвет" 
-                  value={carData.color} 
-                  readOnly
-                />
-                <TextInput 
-                  label="Статус" 
-                  value={carData.status} 
-                  readOnly
-                />
-              </Stack>
-            </Paper>
-          </Grid.Col>
-        </Grid>
+        <Paper p="md" shadow="sm" radius="md">
+          <Stack gap="xs">
+            <Group align="center">
+              <ActionIcon 
+                variant="subtle" 
+                size="xl" 
+                onClick={() => setOpenedPhoto(true)}
+                title="Просмотреть фото автомобиля"
+              >
+                <Box p="sm" bg="blue.1" style={{ borderRadius: '50%' }}>
+                  <IconPhoto size="2rem" color="var(--mantine-color-blue-6)" />
+                </Box>
+              </ActionIcon>
+              <Box>
+                <Title order={3}>{carData.brand} {carData.model} {carData.year}</Title>
+                <Badge color="green" variant="light">{carData.status}</Badge>
+              </Box>
+            </Group>
+
+            <Group grow>
+              <TextInput 
+                label="ID автомобиля" 
+                value={carData.id} 
+                readOnly 
+              />
+              <TextInput 
+                label="Гос. номер" 
+                value={carData.plateNumber} 
+                readOnly 
+              />
+            </Group>
+
+            <Group grow>
+              <TextInput 
+                label="Марка" 
+                value={carData.brand} 
+                readOnly 
+              />
+              <TextInput 
+                label="Модель" 
+                value={carData.model} 
+                readOnly 
+              />
+            </Group>
+
+            <Group grow>
+              <TextInput 
+                label="Год выпуска" 
+                value={carData.year.toString()} 
+                readOnly 
+              />
+              <TextInput 
+                label="Цвет" 
+                value={carData.color} 
+                readOnly 
+              />
+            </Group>
+
+            <TextInput 
+              label="VIN номер" 
+              value={carData.vin} 
+              readOnly 
+            />
+          </Stack>
+        </Paper>
+
+        {/* Документы */}
+        <Paper p="md" shadow="sm" radius="md">
+          <Title order={3} mb="md">Документы автомобиля</Title>
+          <Stack gap="sm">
+            {carData.documents.map((doc, index) => (
+              <Group key={index} justify="space-between">
+                <Box>
+                  <Text fw={500}>{doc.type}</Text>
+                  <Text size="sm" c="dimmed">№ {doc.number} от {doc.date}</Text>
+                </Box>
+                <ActionIcon 
+                  variant="subtle" 
+                  color="blue"
+                  onClick={() => handleDownload(doc.type)}
+                  title="Скачать документ"
+                >
+                  <IconDownload size="1rem" />
+                </ActionIcon>
+              </Group>
+            ))}
+          </Stack>
+        </Paper>
 
         {/* Комментарий */}
         <Paper p="md" shadow="sm" radius="md">
-          <Title order={4} mb="md">Комментарий</Title>
+          <Title order={3} mb="md">Комментарий</Title>
           <TextInput 
             value={carData.comment} 
             readOnly
           />
         </Paper>
-
-        {/* Документы */}
-        <Paper p="md" shadow="sm" radius="md">
-          <Title order={4} mb="md">Документы автомобиля</Title>
-          <Stack gap="md">
-            <FileInput 
-              label="Паспорт транспортного средства" 
-              placeholder="Загрузить файл"
-              rightSection={<IconUpload size="1rem" />}
-              accept=".pdf,.jpg,.png"
-            />
-            <FileInput 
-              label="Свидетельство о регистрации" 
-              placeholder="Загрузить файл"
-              rightSection={<IconUpload size="1rem" />}
-              accept=".pdf,.jpg,.png"
-            />
-            <FileInput 
-              label="Страховой полис" 
-              placeholder="Загрузить файл"
-              rightSection={<IconUpload size="1rem" />}
-              accept=".pdf,.jpg,.png"
-            />
-            <FileInput 
-              label="Фото автомобиля" 
-              placeholder="Загрузить файл"
-              rightSection={<IconPhoto size="1rem" />}
-              accept="image/*"
-            />
-          </Stack>
-        </Paper>
-
-        {/* Кнопки действий */}
-        <Group justify="flex-end" mt="md">
-          <Button 
-            variant="outline" 
-            color="red" 
-            leftSection={<IconTrash size="1rem" />}
-          >
-            Удалить
-          </Button>
-          <Button 
-            color="blue" 
-            leftSection={<IconCheck size="1rem" />}
-          >
-            Сохранить изменения
-          </Button>
-        </Group>
       </Stack>
     </Container>
   );

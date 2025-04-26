@@ -11,26 +11,30 @@ import {
   Group,
   Center,
   Anchor,
-  rem} from '@mantine/core';
-import { clients } from '../data/clientsData';
+  rem
+} from '@mantine/core';
+import { orders } from '../data/ordersData';
 import { useNavigate } from 'react-router-dom';
 import { IconPlus, IconArrowsSort } from '@tabler/icons-react';
 
-interface Client {
+interface Request {
   id: number;
-  name: string;
-  phone: string;
-  email: string;
+  customerName: string;
+  carBrand: string;
+  carModel: string;
+  startDate: string;
+  endDate: string;
+  licensePlate: string;
 }
 
-type SortField = 'id' | 'name';
+type SortField = 'id' | 'customerName' | 'carBrand' | 'carModel' | 'startDate' | 'endDate' | 'licensePlate';
 type SortDirection = 'asc' | 'desc';
 
-const ClientsPage = () => {
+const RequestsPage = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [activePage, setActivePage] = useState(1);
-  const [clientsData, setClientsData] = useState<Client[]>([]);
+  const [requestsData, setRequestsData] = useState<Request[]>([]);
   const [loading, setLoading] = useState(false);
   const [sortConfig, setSortConfig] = useState<{
     field: SortField;
@@ -41,7 +45,7 @@ const ClientsPage = () => {
   const loadDataFromDB = async () => {
     setLoading(true);
     await new Promise(resolve => setTimeout(resolve, 500));
-    setClientsData(clients);
+    setRequestsData(orders); // Здесь orders - это импортированные данные, можно оставить или изменить на requests
     setLoading(false);
   };
 
@@ -60,27 +64,32 @@ const ClientsPage = () => {
     }
   };
 
-  const sortedClients = [...clientsData].sort((a, b) => {
+  const sortedRequests = [...requestsData].sort((a, b) => {
     if (sortConfig.field === 'id') {
       return sortConfig.direction === 'asc' ? a.id - b.id : b.id - a.id;
     } else {
+      const aValue = a[sortConfig.field].toLowerCase();
+      const bValue = b[sortConfig.field].toLowerCase();
       return sortConfig.direction === 'asc'
-        ? a.name.localeCompare(b.name)
-        : b.name.localeCompare(a.name);
+        ? aValue.localeCompare(bValue)
+        : bValue.localeCompare(aValue);
     }
   });
 
-  const filteredClients = sortedClients.filter(client =>
-    client.name.toLowerCase().includes(search.toLowerCase())
+  const filteredRequests = sortedRequests.filter(request =>
+    request.customerName.toLowerCase().includes(search.toLowerCase()) ||
+    request.carBrand.toLowerCase().includes(search.toLowerCase()) ||
+    request.carModel.toLowerCase().includes(search.toLowerCase()) ||
+    request.licensePlate.toLowerCase().includes(search.toLowerCase())
   );
 
-  const paginatedClients = filteredClients.slice(
+  const paginatedRequests = filteredRequests.slice(
     (activePage - 1) * itemsPerPage,
     activePage * itemsPerPage
   );
 
-  const handleClientClick = (clientId: number) => {
-    navigate(`/clients/${clientId}`);
+  const handleRequestClick = (requestId: number) => {
+    navigate(`/requests/${requestId}`);
   };
 
   const SortableHeader = ({ 
@@ -119,18 +128,18 @@ const ClientsPage = () => {
         <LoadingOverlay visible={loading} overlayProps={{ blur: 2 }} />
 
         <Group justify="space-between" mb="sm" align="center">
-          <Title order={2}>Клиенты</Title>
+          <Title order={2}>Заявки</Title>
           <Button 
             leftSection={<IconPlus size="1rem" />}
-            onClick={() => navigate('/clients/add')}
+            onClick={() => navigate('/requests/add')}
             variant="filled"
           >
-            Добавить клиента
+            Добавить заявку
           </Button>
         </Group>
 
         <TextInput
-          placeholder="Поиск клиента"
+          placeholder="Поиск заявки"
           value={search}
           onChange={(event) => setSearch(event.currentTarget.value)}
           mb="md"
@@ -147,58 +156,64 @@ const ClientsPage = () => {
           <colgroup>
             <col style={{ width: rem(80) }} />
             <col style={{ width: rem(250) }} />
-            <col style={{ width: rem(180) }} />
-            <col />
-11:22
-
-
-</colgroup>
+            <col style={{ width: rem(150) }} />
+            <col style={{ width: rem(150) }} />
+            <col style={{ width: rem(120) }} />
+            <col style={{ width: rem(120) }} />
+            <col style={{ width: rem(120) }} />
+          </colgroup>
           <Table.Thead>
             <Table.Tr>
               <SortableHeader field="id">
                 <Box ta="center">ID</Box>
               </SortableHeader>
-              <SortableHeader field="name">ФИО</SortableHeader>
-              <Table.Th style={{ paddingLeft: rem(16), paddingRight: rem(16) }}>Телефон</Table.Th>
-              <Table.Th style={{ paddingLeft: rem(16), paddingRight: rem(16) }}>Email</Table.Th>
+              <SortableHeader field="customerName">ФИО клиента</SortableHeader>
+              <SortableHeader field="carBrand">Марка авто</SortableHeader>
+              <SortableHeader field="carModel">Модель авто</SortableHeader>
+              <SortableHeader field="startDate">Дата начала</SortableHeader>
+              <SortableHeader field="endDate">Дата конца</SortableHeader>
+              <SortableHeader field="licensePlate">Госномер</SortableHeader>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
-            {paginatedClients.length > 0 ? (
-              paginatedClients.map(client => (
-                <Table.Tr key={client.id}>
+            {paginatedRequests.length > 0 ? (
+              paginatedRequests.map(request => (
+                <Table.Tr key={request.id}>
                   <Table.Td style={{ textAlign: 'center', paddingLeft: rem(16), paddingRight: rem(16) }}>
-                    {client.id}
+                    {request.id}
                   </Table.Td>
                   <Table.Td style={{ paddingLeft: rem(16), paddingRight: rem(16) }}>
                     <Anchor
                       component="button"
                       type="button"
-                      onClick={() => handleClientClick(client.id)}
+                      onClick={() => handleRequestClick(request.id)}
                       c="blue"
                       underline="never"
                     >
-                      {client.name}
+                      {request.customerName}
                     </Anchor>
                   </Table.Td>
-                  <Table.Td style={{ paddingLeft: rem(16), paddingRight: rem(16) }}>{client.phone}</Table.Td>
-                  <Table.Td style={{ paddingLeft: rem(16), paddingRight: rem(16) }}>{client.email}</Table.Td>
+                  <Table.Td style={{ paddingLeft: rem(16), paddingRight: rem(16) }}>{request.carBrand}</Table.Td>
+                  <Table.Td style={{ paddingLeft: rem(16), paddingRight: rem(16) }}>{request.carModel}</Table.Td>
+                  <Table.Td style={{ paddingLeft: rem(16), paddingRight: rem(16) }}>{request.startDate}</Table.Td>
+                  <Table.Td style={{ paddingLeft: rem(16), paddingRight: rem(16) }}>{request.endDate}</Table.Td>
+                  <Table.Td style={{ paddingLeft: rem(16), paddingRight: rem(16) }}>{request.licensePlate}</Table.Td>
                 </Table.Tr>
               ))
             ) : (
               <Table.Tr>
-                <Table.Td colSpan={4} style={{ textAlign: 'center' }}>
-                  {clientsData.length === 0 ? 'Загрузка данных...' : 'Клиенты не найдены'}
+                <Table.Td colSpan={7} style={{ textAlign: 'center' }}>
+                  {requestsData.length === 0 ? 'Загрузка данных...' : 'Заявки не найдены'}
                 </Table.Td>
               </Table.Tr>
             )}
           </Table.Tbody>
         </Table>
 
-        {filteredClients.length > 0 && (
+        {filteredRequests.length > 0 && (
           <Center mt="md">
             <Pagination
-              total={Math.ceil(filteredClients.length / itemsPerPage)}
+              total={Math.ceil(filteredRequests.length / itemsPerPage)}
               value={activePage}
               onChange={setActivePage}
             />
@@ -209,4 +224,4 @@ const ClientsPage = () => {
   );
 };
 
-export default ClientsPage;
+export default RequestsPage;
