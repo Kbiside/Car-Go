@@ -18,13 +18,15 @@ import ClientProfilePage from "./pages/client/ProfileClient.tsx";
 import EmployeeProfilePage from "./pages/sotr/sotrProfile.tsx";
 import CreateRequest from "./pages/Zayavki/AddZaya2.tsx";
 import RequestsPage from "./pages/Zayavki/Zaya.tsx";
+import OrderCardPage from "./pages/Zayavki/zayaProfile.tsx";
+import FeedbackPage from "./pages/sviaz/sviaz.tsx";
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <MantineProvider theme={theme}>
   <BrowserRouter>
   <Routes>
       <Route element={<AppLayout />}>
         <Route path="dashboard" element={<DashboardPage />} />
-        
+        <Route path="feedback" element={<FeedbackPage />} />
         {/* Клиенты */}
         <Route path="clients">
           <Route index element={<ClientsPage />} />
@@ -41,6 +43,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
         <Route path="requests">
           <Route index element={<RequestsPage/>} /> 
           <Route path="add" element={<CreateRequest />} />
+          <Route path=":id" element={<OrderCardPage />} />
         </Route>
         <Route path="employees">
           <Route index element={<EmployeesPage />} /> 

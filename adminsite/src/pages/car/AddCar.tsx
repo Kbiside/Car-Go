@@ -8,7 +8,6 @@ import {
   Container,
   SimpleGrid,
   Text,
-  Grid,
 } from '@mantine/core';
 import { IconUpload } from '@tabler/icons-react';
 import { useState } from 'react';
@@ -39,7 +38,7 @@ const AddCarPage = () => {
   return (
     <Container size="lg">
       <Title order={2} mb="md">Добавить новый автомобиль</Title>
-      <Stack >
+      <Stack>
         <Title order={4}>Информация об автомобиле</Title>
         
         <SimpleGrid cols={2} spacing="md">
@@ -66,29 +65,23 @@ const AddCarPage = () => {
             onChange={(e) => handleChange('model', e.target.value)}
           />
           
-          <Grid gutter="md">
-            <Grid.Col span={6}>
-              <TextInput 
-                label={
-                  <>
-                    Регистрационный номер
-                    <RequiredStar filled={!!formValues.number} />
-                  </>
-                } 
-                placeholder="Введите номер"
-                value={formValues.number}
-                onChange={(e) => handleChange('number', e.target.value)}
-              />
-            </Grid.Col>
-            <Grid.Col span={6}>
-              <TextInput 
-                label="Комментарий" 
-                placeholder="Введите комментарий" 
-                value={formValues.comment}
-                onChange={(e) => handleChange('comment', e.target.value)}
-              />
-            </Grid.Col>
-          </Grid>
+          <TextInput 
+            label={
+              <>
+                Регистрационный номер
+                <RequiredStar filled={!!formValues.number} />
+              </>
+            } 
+            placeholder="Введите номер"
+            value={formValues.number}
+            onChange={(e) => handleChange('number', e.target.value)}
+          />
+          <TextInput 
+            label="Комментарий" 
+            placeholder="Введите комментарий" 
+            value={formValues.comment}
+            onChange={(e) => handleChange('comment', e.target.value)}
+          />
         </SimpleGrid>
 
         <Title order={4}>Загрузка документов</Title>

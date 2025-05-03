@@ -11,7 +11,8 @@ import {
   Group,
   Center,
   Anchor,
-  rem} from '@mantine/core';
+  rem
+} from '@mantine/core';
 import { clients } from '../data/clientsData';
 import { useNavigate } from 'react-router-dom';
 import { IconPlus, IconArrowsSort } from '@tabler/icons-react';
@@ -143,16 +144,14 @@ const ClientsPage = () => {
           withColumnBorders
           horizontalSpacing="md"
           verticalSpacing="sm"
+          layout="fixed"
         >
           <colgroup>
-            <col style={{ width: rem(80) }} />
-            <col style={{ width: rem(250) }} />
-            <col style={{ width: rem(180) }} />
-            <col />
-11:22
-
-
-</colgroup>
+            <col style={{ width: '10%' }} /> {/* ID */}
+            <col style={{ width: '30%' }} /> {/* ФИО */}
+            <col style={{ width: '25%' }} /> {/* Телефон */}
+            <col style={{ width: '35%' }} /> {/* Email */}
+          </colgroup>
           <Table.Thead>
             <Table.Tr>
               <SortableHeader field="id">

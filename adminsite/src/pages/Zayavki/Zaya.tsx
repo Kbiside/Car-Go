@@ -27,7 +27,7 @@ interface Request {
   licensePlate: string;
 }
 
-type SortField = 'id' | 'customerName' | 'carBrand' | 'carModel' | 'startDate' | 'endDate' | 'licensePlate';
+type SortField = 'id' | 'customerName' | 'carBrand' | 'startDate' | 'endDate';
 type SortDirection = 'asc' | 'desc';
 
 const RequestsPage = () => {
@@ -45,7 +45,7 @@ const RequestsPage = () => {
   const loadDataFromDB = async () => {
     setLoading(true);
     await new Promise(resolve => setTimeout(resolve, 500));
-    setRequestsData(orders); // Здесь orders - это импортированные данные, можно оставить или изменить на requests
+    setRequestsData(orders);
     setLoading(false);
   };
 
@@ -140,8 +140,7 @@ const RequestsPage = () => {
 
         <TextInput
           placeholder="Поиск заявки"
-          value={search}
-          onChange={(event) => setSearch(event.currentTarget.value)}
+          value={search} onChange={(event) => setSearch(event.currentTarget.value)}
           mb="md"
           w="100%"
         />
@@ -164,15 +163,15 @@ const RequestsPage = () => {
           </colgroup>
           <Table.Thead>
             <Table.Tr>
-              <SortableHeader field="id">
-                <Box ta="center">ID</Box>
-              </SortableHeader>
+              <Table.Th style={{ textAlign: 'center', paddingLeft: rem(16), paddingRight: rem(16) }}>
+                ID
+              </Table.Th>
               <SortableHeader field="customerName">ФИО клиента</SortableHeader>
               <SortableHeader field="carBrand">Марка авто</SortableHeader>
-              <SortableHeader field="carModel">Модель авто</SortableHeader>
+              <Table.Th style={{ paddingLeft: rem(16), paddingRight: rem(16) }}>Модель авто</Table.Th>
               <SortableHeader field="startDate">Дата начала</SortableHeader>
               <SortableHeader field="endDate">Дата конца</SortableHeader>
-              <SortableHeader field="licensePlate">Госномер</SortableHeader>
+              <Table.Th style={{ paddingLeft: rem(16), paddingRight: rem(16) }}>Госномер</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
@@ -180,9 +179,6 @@ const RequestsPage = () => {
               paginatedRequests.map(request => (
                 <Table.Tr key={request.id}>
                   <Table.Td style={{ textAlign: 'center', paddingLeft: rem(16), paddingRight: rem(16) }}>
-                    {request.id}
-                  </Table.Td>
-                  <Table.Td style={{ paddingLeft: rem(16), paddingRight: rem(16) }}>
                     <Anchor
                       component="button"
                       type="button"
@@ -190,9 +186,10 @@ const RequestsPage = () => {
                       c="blue"
                       underline="never"
                     >
-                      {request.customerName}
+                      {request.id}
                     </Anchor>
                   </Table.Td>
+                  <Table.Td style={{ paddingLeft: rem(16), paddingRight: rem(16) }}>{request.customerName}</Table.Td>
                   <Table.Td style={{ paddingLeft: rem(16), paddingRight: rem(16) }}>{request.carBrand}</Table.Td>
                   <Table.Td style={{ paddingLeft: rem(16), paddingRight: rem(16) }}>{request.carModel}</Table.Td>
                   <Table.Td style={{ paddingLeft: rem(16), paddingRight: rem(16) }}>{request.startDate}</Table.Td>
