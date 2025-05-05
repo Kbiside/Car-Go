@@ -128,7 +128,7 @@ const RequestsPage = () => {
         <LoadingOverlay visible={loading} overlayProps={{ blur: 2 }} />
 
         <Group justify="space-between" mb="sm" align="center">
-          <Title order={2}>Заявки</Title>
+          <Title order={2}>Заказы</Title>
           <Button 
             leftSection={<IconPlus size="1rem" />}
             onClick={() => navigate('/requests/add')}

@@ -22,7 +22,8 @@ import OrderCardPage from "./pages/Zayavki/zayaProfile.tsx";
 import FeedbackPage from "./pages/sviaz/sviaz.tsx";
 import EditCarPage from "./pages/car/EditCar.tsx";
 import EditClientPage from "./pages/client/EditClient.tsx";
-import EditEmployeePage from "./pages/sotr/sotrProfile.tsx";
+import EditEmployeePage from "./pages/sotr/EditSotr.tsx";
+import EditRequestPage from "./pages/Zayavki/EditZaya.tsx";
 
 const router = createBrowserRouter([
   {
@@ -90,18 +91,23 @@ const router = createBrowserRouter([
       },
       {
         path: "requests",
-        handle: { crumb: "Заявки" },
+        handle: { crumb: "Заказы" },
         children: [
           { index: true, element: <RequestsPage /> },
           { 
             path: "add", 
             element: <CreateRequest />,
-            handle: { crumb: "Создать заявку" }
+            handle: { crumb: "Создать заказ" }
           },
           { 
             path: ":id", 
             element: <OrderCardPage />,
-            handle: { crumb: "Карточка заявки" }
+            handle: { crumb: "Карточка заказа" }
+          },
+          { 
+            path: "edit", 
+            element: <EditRequestPage />,
+            handle: { crumb: "Редактировать заказ" }
           }
         ]
       },

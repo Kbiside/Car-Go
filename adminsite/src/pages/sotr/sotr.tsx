@@ -81,8 +81,8 @@ const EmployeesPage = () => {
     activePage * itemsPerPage
   );
 
-  const handleClientClick = (clientId: number) => {
-    navigate(`/clients/${clientId}`);
+  const handleClientClick = (EmployeeId: number) => {
+    navigate(`/employees/${EmployeeId}`);
   };
 
   const SortableHeader = ({ 
