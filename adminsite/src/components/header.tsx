@@ -38,7 +38,7 @@ export function Header({
       color: 'green',
     });
     // Здесь должна быть логика выхода
-    navigate('/login');
+    navigate('/');
   };
 
   return (

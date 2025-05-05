@@ -28,5 +28,4 @@ export interface Employee {
       email: 'sidorov@example.com',
       position: 'Менеджер по продажам'
     },
-    // Добавьте больше клиентов по необходимости
   ];

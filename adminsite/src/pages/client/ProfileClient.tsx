@@ -15,12 +15,15 @@ import {
 } from '@mantine/core';
 import { IconEdit, IconLicense, IconId, IconDownload } from '@tabler/icons-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Добавляем импорт для навигации
 
 export default function ClientProfilePage() {
   const [openedDoc, setOpenedDoc] = useState<string | null>(null);
+  const navigate = useNavigate(); // Инициализируем навигацию
   
   // Данные клиента (включая комментарий)
   const clientData = {
+    id: '937601', // Добавляем id клиента для маршрутизации
     fullName: 'Смирнова Анна Сергеевна',
     clientId: 'ID 937601',
     phone: '89510833438',
@@ -59,6 +62,10 @@ export default function ClientProfilePage() {
     link.href = `#${docType.toLowerCase().replace(' ', '-')}`;
     link.download = `${docType}_${clientData.fullName}.pdf`;
     link.click();
+  };
+
+  const handleEditClick = () => {
+    navigate(`/clients/edit`); 
   };
 
   return (
@@ -160,7 +167,11 @@ export default function ClientProfilePage() {
         </Paper>
 
         <Group justify="flex-end">
-          <Button leftSection={<IconEdit size="1rem" />} variant="outline">
+          <Button 
+            leftSection={<IconEdit size="1rem" />} 
+            variant="outline"
+            onClick={handleEditClick} // Добавляем обработчик клика
+          >
             Редактировать профиль
           </Button>
         </Group>

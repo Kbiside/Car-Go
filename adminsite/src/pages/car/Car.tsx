@@ -14,11 +14,13 @@ import {
   Anchor,
   Badge
 } from '@mantine/core';
-import { IconDownload, IconCar, IconEdit, IconPhoto, IconLicense, IconCertificate } from '@tabler/icons-react';
+import { IconDownload, IconCar, IconEdit, IconLicense, IconCertificate } from '@tabler/icons-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const CarProfilePage = () => {
   const [openedPhoto, setOpenedPhoto] = useState(false);
+  const navigate = useNavigate();
   
   // Данные автомобиля
   const carData = {
@@ -69,6 +71,11 @@ const CarProfilePage = () => {
     event.stopPropagation();
     console.log(`Скачивание ${docType}`);
     // В реальном приложении здесь будет запрос к API для скачивания файла
+  };
+
+  const handleEditClick = () => {
+    // Переход на страницу редактирования с передачей ID автомобиля
+    navigate(`/cars/edit`);
   };
 
   return (
@@ -186,6 +193,7 @@ const CarProfilePage = () => {
           <Button 
             leftSection={<IconEdit size="1rem" />}
             variant="outline"
+            onClick={handleEditClick}
           >
             Редактировать
           </Button>

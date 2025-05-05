@@ -1,15 +1,15 @@
 import "@mantine/core/styles.css";
 import '@mantine/dates/styles.css';
-
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, Route, Routes } from "react-router";
-import { ClientAddPage } from "./pages/client/AddClient.tsx";
 import { MantineProvider } from "@mantine/core";
 import { theme } from "./theme.ts";
+import { AppLayout } from "./components/AppLayout.tsx";
+import LoginPage from "./pages/LoginPage.tsx";
 import { DashboardPage } from "./pages/Dashboard.tsx";
+import { ClientAddPage } from "./pages/client/AddClient.tsx";
 import AddCarPage from "./pages/car/AddCar.tsx";
 import CarProfile from "./pages/car/Car.tsx";
-import { AppLayout } from "./components/AppLayout.tsx";
 import ClientsPage from "./pages/client/Client.tsx";
 import EmployeesPage from "./pages/sotr/sotr.tsx";
 import AddEmployee from "./pages/sotr/AddSotr.tsx";
@@ -20,41 +20,124 @@ import CreateRequest from "./pages/Zayavki/AddZaya2.tsx";
 import RequestsPage from "./pages/Zayavki/Zaya.tsx";
 import OrderCardPage from "./pages/Zayavki/zayaProfile.tsx";
 import FeedbackPage from "./pages/sviaz/sviaz.tsx";
+import EditCarPage from "./pages/car/EditCar.tsx";
+import EditClientPage from "./pages/client/EditClient.tsx";
+import EditEmployeePage from "./pages/sotr/sotrProfile.tsx";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <LoginPage />, 
+  },
+  {
+    element: (
+        <AppLayout />
+    ),
+    children: [
+      {
+        path: "dashboard",
+        element: <DashboardPage />,
+        handle: { crumb: "Дашборд" }
+      },
+      {
+        path: "feedback",
+        element: <FeedbackPage />,
+        handle: { crumb: "Обратная связь" }
+      },
+      {
+        path: "clients",
+        handle: { crumb: "Клиенты" },
+        children: [
+          { index: true, element: <ClientsPage /> },
+          { 
+            path: "add", 
+            element: <ClientAddPage />,
+            handle: { crumb: "Добавить клиента" }
+          },
+          { 
+            path: ":id", 
+            element: <ClientProfilePage />,
+            handle: { crumb: "Профиль клиента" }
+          },
+          { 
+            path: "edit", 
+            element: <EditClientPage />,
+            handle: { crumb: "Редактировать профиль клиента" }
+          }
+        ]
+      },
+      {
+        path: "cars",
+        handle: { crumb: "Автопарк" },
+        children: [
+          { index: true, element: <VehiclesPage /> },
+          { 
+            path: "add", 
+            element: <AddCarPage />,
+            handle: { crumb: "Добавить авто" }
+          },
+          { 
+            path: ":id", 
+            element: <CarProfile />,
+            handle: { crumb: "Карточка авто" }
+          },
+          { 
+            path: "edit", 
+            element: <EditCarPage />,
+            handle: { crumb: "Редактировать авто" }
+          }
+        ]
+      },
+      {
+        path: "requests",
+        handle: { crumb: "Заявки" },
+        children: [
+          { index: true, element: <RequestsPage /> },
+          { 
+            path: "add", 
+            element: <CreateRequest />,
+            handle: { crumb: "Создать заявку" }
+          },
+          { 
+            path: ":id", 
+            element: <OrderCardPage />,
+            handle: { crumb: "Карточка заявки" }
+          }
+        ]
+      },
+      {
+        path: "employees",
+        handle: { crumb: "Сотрудники" },
+        children: [
+          { index: true, element: <EmployeesPage /> },
+          { 
+            path: "add", 
+            element: <AddEmployee />,
+            handle: { crumb: "Добавить сотрудника" }
+          },
+          { 
+            path: ":id", 
+            element: <EmployeeProfilePage />,
+            handle: { crumb: "Профиль сотрудника" }
+          },
+          { 
+            path: "edit", 
+            element: <EditEmployeePage />,
+            handle: { crumb: "Редактировать профиль сотрудника" }
+          }
+        ]
+      },
+    ]
+  },
+  { 
+    path: "*", 
+    element: <div>404 Not Found</div>,
+    handle: { crumb: "Страница не найдена" }
+  }
+]);
+
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <MantineProvider theme={theme}>
-  <BrowserRouter>
-  <Routes>
-      <Route element={<AppLayout />}>
-        <Route path="dashboard" element={<DashboardPage />} />
-        <Route path="feedback" element={<FeedbackPage />} />
-        {/* Клиенты */}
-        <Route path="clients">
-          <Route index element={<ClientsPage />} />
-          <Route path="add" element={<ClientAddPage />} />
-          <Route path=":id" element={<ClientProfilePage />} />
-        </Route>
-        {/* Автопарк */}
-        <Route path="cars">
-          <Route index element={<VehiclesPage />} /> 
-          <Route path="add" element={<AddCarPage />} />
-          <Route path=":id" element={<CarProfile />} />
-        </Route>
-        {/* Автопарк */}
-        <Route path="requests">
-          <Route index element={<RequestsPage/>} /> 
-          <Route path="add" element={<CreateRequest />} />
-          <Route path=":id" element={<OrderCardPage />} />
-        </Route>
-        <Route path="employees">
-          <Route index element={<EmployeesPage />} /> 
-          <Route path="add" element={<AddEmployee />} />
-          <Route path=":id" element={<EmployeeProfilePage />} />
-        </Route>
-        {/* Резервные маршруты */}
-        <Route path="/" element={<DashboardPage />} />
-        <Route path="*" element={<div>404 Not Found</div>} />
-      </Route>
-    </Routes>
-  </BrowserRouter>
+    <RouterProvider router={router} />
   </MantineProvider>
 );

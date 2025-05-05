@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { AppShell } from '@mantine/core';
+import { AppShell, Box } from '@mantine/core';
 import { Header } from '../components/header';
 import { Navbar } from '../components/navbar';
 import { Outlet } from 'react-router';
+import { AppBreadcrumbs } from './Breadcrumbs';
 
 export function AppLayout() {
   const [mobileOpened, setMobileOpened] = useState(false);
@@ -37,7 +38,10 @@ export function AppLayout() {
       </AppShell.Navbar>
       
       <AppShell.Main>
-        <Outlet />
+        <Box p="md">
+          <AppBreadcrumbs />
+          <Outlet />
+        </Box>
       </AppShell.Main>
     </AppShell>
   );

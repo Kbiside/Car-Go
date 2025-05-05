@@ -9,11 +9,14 @@ import {
   Textarea,
   Pagination,
   Divider,
-  MantineTheme,
+  useMantineTheme,
 } from '@mantine/core';
 import { IconSend } from '@tabler/icons-react';
+import type { CSSProperties } from 'react';
 
 export default function FeedbackPage() {
+  const theme = useMantineTheme();
+  
   // Данные обращений
   const feedbackItems = [
     {
@@ -36,30 +39,36 @@ export default function FeedbackPage() {
     }
   ];
 
+  // Стили для Pagination
+  const paginationStyles = {
+    root: {
+      justifyContent: 'center'
+    },
+    control: {
+      '&[data-active]': {
+        background: `linear-gradient(to right, ${theme.colors.indigo[6]}, ${theme.colors.cyan[6]})`,
+      } as CSSProperties,
+    }
+  };
+
   return (
     <Container>
       <Title order={2} mb="md">Обратная связь</Title>
       
       <Pagination 
         total={10} 
-        position="center" 
-        my="md"
+        mt="md"
+        mb="md"
         siblings={1}
-        styles={(theme: MantineTheme) => ({
-          item: {
-            '&[data-active]': {
-              backgroundImage: theme.fn.gradient({ from: 'indigo', to: 'cyan' }),
-            },
-          },
-        })}
+        styles={paginationStyles}
       />
 
-      <Stack spacing="md">
+      <Stack gap="md">
         {feedbackItems.map((item, index) => (
           <Card key={index} shadow="sm" p="lg" withBorder>
-            <Stack spacing="sm">
-              <Group position="apart">
-                <Text size="sm" color="dimmed">{item.id}</Text>
+            <Stack gap="sm">
+              <Group justify="space-between">
+                <Text size="sm" c="dimmed">{item.id}</Text>
                 <Text fw={500}>{item.userName}</Text>
               </Group>
               
@@ -74,7 +83,7 @@ export default function FeedbackPage() {
                 minRows={3}
               />
               
-              <Group position="right" mt="md">
+              <Group justify="flex-end" mt="md">
                 <Button 
                   leftSection={<IconSend size="1rem" />}
                   variant="filled"
@@ -90,16 +99,9 @@ export default function FeedbackPage() {
 
       <Pagination 
         total={10} 
-        position="center" 
         mt="md"
         siblings={1}
-        styles={(theme: MantineTheme) => ({
-          item: {
-            '&[data-active]': {
-              backgroundImage: theme.fn.gradient({ from: 'indigo', to: 'cyan' }),
-            },
-          },
-        })}
+        styles={paginationStyles}
       />
     </Container>
   );
