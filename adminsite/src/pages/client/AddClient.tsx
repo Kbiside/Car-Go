@@ -16,6 +16,7 @@ import { IconUpload } from '@tabler/icons-react';
 import { useState } from 'react';
 
 export function ClientAddPage() {
+
   const [formValues, setFormValues] = useState({
     clientId: '',
     fullName: '',
@@ -27,7 +28,6 @@ export function ClientAddPage() {
     issueDate: '',
     issuingAuthority: '',
     inn: '',
-    position: '',
     comment: '',
     passportFile: null,
     driverLicense: null,
@@ -175,14 +175,6 @@ export function ClientAddPage() {
               placeholder="123456789"
               value={formValues.inn}
               onChange={(e) => handleChange('inn', e.target.value)}
-            />
-          </Grid.Col>
-          <Grid.Col span={12}>
-            <TextInput 
-              label="Должность" 
-              placeholder="Введите должность сотрудника" 
-              value={formValues.position}
-              onChange={(e) => handleChange('position', e.target.value)}
             />
           </Grid.Col>
           <Grid.Col span={12}>
