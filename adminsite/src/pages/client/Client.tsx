@@ -11,54 +11,51 @@ import {
   Group,
   Center,
   Anchor,
-  rem
+  rem,
+  Notification
 } from '@mantine/core';
-import { clients } from '../data/clientsData';
 import { useNavigate } from 'react-router-dom';
-import { IconPlus, IconArrowsSort } from '@tabler/icons-react';
+import { IconPlus, IconArrowsSort, IconX } from '@tabler/icons-react';
+import { useFetch } from '@mantine/hooks';
+import api from '/api/clients';
 
 interface Client {
   id: number;
-  name: string;
+  fullName: string;
   phone: string;
-  email: string;
+  email: string | null;
+  birthDate?: string;
+  gender?: string;
 }
 
-type SortField = 'id' | 'name';
+type SortField = 'id' | 'fullName';
 type SortDirection = 'asc' | 'desc';
 
 const ClientsPage = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [activePage, setActivePage] = useState(1);
-  const [clientsData, setClientsData] = useState<Client[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [sortConfig, setSortConfig] = useState<{
     field: SortField;
     direction: SortDirection;
   }>({ field: 'id', direction: 'asc' });
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
 
-  const loadDataFromDB = async () => {
-    setLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 500));
-    setClientsData(clients);
-    setLoading(false);
-  };
+  // Загрузка данных с бэкенда
+  const { data: clientsData = [], loading, error: fetchError } = useFetch(api.getAllClients);
 
   useEffect(() => {
-    loadDataFromDB();
-  }, []);
+    if (fetchError) {
+      setError(fetchError.message || 'Ошибка загрузки данных');
+    }
+  }, [fetchError]);
 
   const handleSort = (field: SortField) => {
-    if (sortConfig.field === field) {
-      setSortConfig({
-        field,
-        direction: sortConfig.direction === 'asc' ? 'desc' : 'asc',
-      });
-    } else {
-      setSortConfig({ field, direction: 'asc' });
-    }
+    setSortConfig({
+      field,
+      direction: sortConfig.field === field && sortConfig.direction === 'asc' ? 'desc' : 'asc',
+    });
   };
 
   const sortedClients = [...clientsData].sort((a, b) => {
@@ -66,13 +63,15 @@ const ClientsPage = () => {
       return sortConfig.direction === 'asc' ? a.id - b.id : b.id - a.id;
     } else {
       return sortConfig.direction === 'asc'
-        ? a.name.localeCompare(b.name)
-        : b.name.localeCompare(a.name);
+        ? (a.fullName || '').localeCompare(b.fullName || '')
+        : (b.fullName || '').localeCompare(a.fullName || '');
     }
   });
 
   const filteredClients = sortedClients.filter(client =>
-    client.name.toLowerCase().includes(search.toLowerCase())
+    client.fullName?.toLowerCase().includes(search.toLowerCase()) ||
+    client.phone?.includes(search) ||
+    client.email?.toLowerCase().includes(search.toLowerCase())
   );
 
   const paginatedClients = filteredClients.slice(
@@ -116,6 +115,18 @@ const ClientsPage = () => {
 
   return (
     <Container size="xl" py="md" pos="relative">
+      {error && (
+        <Notification 
+          icon={<IconX size="1.1rem" />} 
+          color="red" 
+          title="Ошибка"
+          onClose={() => setError(null)}
+          mb="md"
+        >
+          {error}
+        </Notification>
+      )}
+
       <Box pos="relative">
         <LoadingOverlay visible={loading} overlayProps={{ blur: 2 }} />
 
@@ -131,7 +142,7 @@ const ClientsPage = () => {
         </Group>
 
         <TextInput
-          placeholder="Поиск клиента"
+          placeholder="Поиск по ФИО, телефону или email"
           value={search}
           onChange={(event) => setSearch(event.currentTarget.value)}
           mb="md"
@@ -157,7 +168,7 @@ const ClientsPage = () => {
               <SortableHeader field="id">
                 <Box ta="center">ID</Box>
               </SortableHeader>
-              <SortableHeader field="name">ФИО</SortableHeader>
+              <SortableHeader field="fullName">ФИО</SortableHeader>
               <Table.Th style={{ paddingLeft: rem(16), paddingRight: rem(16) }}>Телефон</Table.Th>
               <Table.Th style={{ paddingLeft: rem(16), paddingRight: rem(16) }}>Email</Table.Th>
             </Table.Tr>
@@ -177,17 +188,19 @@ const ClientsPage = () => {
                       c="blue"
                       underline="never"
                     >
-                      {client.name}
+                      {client.fullName}
                     </Anchor>
                   </Table.Td>
                   <Table.Td style={{ paddingLeft: rem(16), paddingRight: rem(16) }}>{client.phone}</Table.Td>
-                  <Table.Td style={{ paddingLeft: rem(16), paddingRight: rem(16) }}>{client.email}</Table.Td>
+                  <Table.Td style={{ paddingLeft: rem(16), paddingRight: rem(16) }}>
+                    {client.email || '-'}
+                  </Table.Td>
                 </Table.Tr>
               ))
             ) : (
               <Table.Tr>
                 <Table.Td colSpan={4} style={{ textAlign: 'center' }}>
-                  {clientsData.length === 0 ? 'Загрузка данных...' : 'Клиенты не найдены'}
+                  {loading ? 'Загрузка данных...' : 'Клиенты не найдены'}
                 </Table.Td>
               </Table.Tr>
             )}
