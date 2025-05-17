@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const requestController = require('../controllers/requestController');
+const authMiddleware = require('../middlewares/authMiddleware');
 
-router.post('/requests', requestController.createRequest);
-router.get('/requests', requestController.getRequests);
-router.get('/requests/:id', requestController.getOneRequest);
-router.get('/requests/client/:clientId', requestController.getClientRequests);
-router.get('/requests/car/:carId', requestController.getCarRequests);
-router.put('/requests/:id', requestController.updateRequest);
-router.delete('/requests/:id', requestController.deleteRequest);
+router.post('/requests', authMiddleware, requestController.createRequest);
+router.get('/requests', authMiddleware, requestController.getRequests);
+router.get('/requests/:id', authMiddleware, requestController.getOneRequest);
+router.get('/requests/client/:clientId', authMiddleware, requestController.getClientRequests);
+router.get('/requests/car/:carId', authMiddleware, requestController.getCarRequests);
+router.put('/requests/:id', authMiddleware, requestController.updateRequest);
+router.delete('/requests/:id', authMiddleware, requestController.deleteRequest);
 
 module.exports = router;

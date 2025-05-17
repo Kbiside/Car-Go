@@ -5,31 +5,24 @@ class ClientController {
     async createClient(req, res) {
         try {
             const { 
-                fullname, 
-                email, 
+                user_id,
+                full_name, 
                 phone, 
-                birthdate, 
+                birth_date, 
                 gender, 
-                passportnumber, 
-                issuedate, 
-                issuingauthority, 
                 inn, 
-                passportfilepath, 
-                driverlicensepath, 
-                comment 
+                comment
             } = req.body;
             
             const { data: newClient, error } = useFetch(async () => {
                 const result = await db.query(
-                    `INSERT INTO Client (
-                        FullName, Email, Phone, BirthDate, Gender, PassportNumber, 
-                        IssueDate, IssuingAuthority, INN, PassportFilePath, 
-                        DriverLicensePath, Comment
-                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`, 
+                    `INSERT INTO clients (
+                        user_id, full_name, phone, birth_date, 
+                        gender, inn, comment
+                    ) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`, 
                     [
-                        fullname, email, phone, birthdate, gender, passportnumber, 
-                        issuedate, issuingauthority, inn, passportfilepath, 
-                        driverlicensepath, comment
+                        user_id, full_name, phone, birth_date, 
+                        gender, inn, comment
                     ]
                 );
                 return result.rows[0];
@@ -49,7 +42,7 @@ class ClientController {
     async getClients(req, res) {
         try {
             const { data: clients, error } = useFetch(async () => {
-                const result = await db.query('SELECT * FROM Client');
+                const result = await db.query('SELECT * FROM clients');
                 return result.rows;
             });
 
@@ -69,7 +62,7 @@ class ClientController {
             const id = req.params.id;
             
             const { data: client, error } = useFetch(async () => {
-                const result = await db.query('SELECT * FROM Client WHERE Id = $1', [id]);
+                const result = await db.query('SELECT * FROM clients WHERE id = $1', [id]);
                 return result.rows[0];
             });
 
@@ -91,41 +84,29 @@ class ClientController {
     async updateClient(req, res) {
         try {
             const { 
-                id, 
-                fullname, 
-                email, 
+                id,
+                full_name, 
                 phone, 
-                birthdate, 
+                birth_date, 
                 gender, 
-                passportnumber, 
-                issuedate, 
-                issuingauthority, 
                 inn, 
-                passportfilepath, 
-                driverlicensepath, 
-                comment 
+                comment
             } = req.body;
             
             const { data: updatedClient, error } = useFetch(async () => {
                 const result = await db.query(
-                    `UPDATE Client SET 
-                        FullName = $1, 
-                        Email = $2, 
-                        Phone = $3, 
-                        BirthDate = $4, 
-                        Gender = $5, 
-                        PassportNumber = $6, 
-                        IssueDate = $7, 
-                        IssuingAuthority = $8, 
-                        INN = $9, 
-                        PassportFilePath = $10, 
-                        DriverLicensePath = $11, 
-                        Comment = $12 
-                    WHERE Id = $13 RETURNING *`, 
+                    `UPDATE clients SET 
+                        full_name = $1, 
+                        phone = $2, 
+                        birth_date = $3, 
+                        gender = $4, 
+                        inn = $5, 
+                        comment = $6,
+                        updated_at = CURRENT_TIMESTAMP
+                    WHERE id = $7 RETURNING *`, 
                     [
-                        fullname, email, phone, birthdate, gender, passportnumber, 
-                        issuedate, issuingauthority, inn, passportfilepath, 
-                        driverlicensepath, comment, id
+                        full_name, phone, birth_date, 
+                        gender, inn, comment, id
                     ]
                 );
                 return result.rows[0];
@@ -151,7 +132,7 @@ class ClientController {
             const id = req.params.id;
             
             const { data: deletedClient, error } = useFetch(async () => {
-                const result = await db.query('DELETE FROM Client WHERE Id = $1 RETURNING *', [id]);
+                const result = await db.query('DELETE FROM clients WHERE id = $1 RETURNING *', [id]);
                 return result.rows[0];
             });
 
@@ -164,6 +145,29 @@ class ClientController {
             }
             
             res.json(deletedClient);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    async getClientDocuments(req, res) {
+        try {
+            const clientId = req.params.clientId;
+            
+            const { data: documents, error } = useFetch(async () => {
+                const result = await db.query(
+                    'SELECT * FROM client_documents WHERE client_id = $1',
+                    [clientId]
+                );
+                return result.rows;
+            });
+
+            if (error) {
+                return res.status(500).json({ error: error.message });
+            }
+
+            res.json(documents);
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: error.message });

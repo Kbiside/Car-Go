@@ -5,35 +5,25 @@ class EmployeeController {
     async createEmployee(req, res) {
         try {
             const { 
-                employeeid,
-                fullname, 
-                email, 
+                user_id,
+                employee_id,
+                full_name, 
                 phone, 
-                birthdate, 
+                birth_date, 
                 gender, 
-                passportnumber, 
-                issuingauthority, 
-                issuedate, 
-                passportcopy, 
                 inn, 
-                position, 
-                workbook, 
-                photo, 
-                educationdocuments, 
-                passwordhash 
+                position
             } = req.body;
             
             const { data: newEmployee, error } = useFetch(async () => {
                 const result = await db.query(
-                    `INSERT INTO Employee (
-                        EmployeeId, FullName, Email, Phone, BirthDate, Gender, 
-                        PassportNumber, IssuingAuthority, IssueDate, PassportCopy, 
-                        INN, Position, WorkBook, Photo, EducationDocuments, PasswordHash
-                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) RETURNING *`, 
+                    `INSERT INTO employees (
+                        user_id, employee_id, full_name, phone, birth_date, 
+                        gender, inn, position
+                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`, 
                     [
-                        employeeid, fullname, email, phone, birthdate, gender, 
-                        passportnumber, issuingauthority, issuedate, passportcopy, 
-                        inn, position, workbook, photo, educationdocuments, passwordhash
+                        user_id, employee_id, full_name, phone, birth_date, 
+                        gender, inn, position
                     ]
                 );
                 return result.rows[0];
@@ -43,9 +33,7 @@ class EmployeeController {
                 return res.status(500).json({ error: error.message });
             }
 
-            // Не возвращаем пароль в ответе
-            const { PasswordHash, ...employeeData } = newEmployee;
-            res.status(201).json(employeeData);
+            res.status(201).json(newEmployee);
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: error.message });
@@ -56,7 +44,7 @@ class EmployeeController {
         try {
             const { data: employees, error } = useFetch(async () => {
                 const result = await db.query(
-                    'SELECT Id, EmployeeId, FullName, Email, Phone, Position FROM Employee'
+                    'SELECT id, employee_id, full_name, phone, position FROM employees'
                 );
                 return result.rows;
             });
@@ -77,7 +65,7 @@ class EmployeeController {
             const id = req.params.id;
             
             const { data: employee, error } = useFetch(async () => {
-                const result = await db.query('SELECT * FROM Employee WHERE Id = $1', [id]);
+                const result = await db.query('SELECT * FROM employees WHERE id = $1', [id]);
                 return result.rows[0];
             });
 
@@ -89,9 +77,7 @@ class EmployeeController {
                 return res.status(404).json({ message: 'Employee not found' });
             }
             
-            // Не возвращаем пароль в ответе
-            const { PasswordHash, ...employeeData } = employee;
-            res.json(employeeData);
+            res.json(employee);
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: error.message });
@@ -102,46 +88,30 @@ class EmployeeController {
         try {
             const { 
                 id,
-                employeeid,
-                fullname, 
-                email, 
+                employee_id,
+                full_name, 
                 phone, 
-                birthdate, 
+                birth_date, 
                 gender, 
-                passportnumber, 
-                issuingauthority, 
-                issuedate, 
-                passportcopy, 
                 inn, 
-                position, 
-                workbook, 
-                photo, 
-                educationdocuments 
+                position
             } = req.body;
             
             const { data: updatedEmployee, error } = useFetch(async () => {
                 const result = await db.query(
-                    `UPDATE Employee SET 
-                        EmployeeId = $1,
-                        FullName = $2, 
-                        Email = $3, 
-                        Phone = $4, 
-                        BirthDate = $5, 
-                        Gender = $6, 
-                        PassportNumber = $7, 
-                        IssuingAuthority = $8, 
-                        IssueDate = $9, 
-                        PassportCopy = $10, 
-                        INN = $11, 
-                        Position = $12, 
-                        WorkBook = $13, 
-                        Photo = $14, 
-                        EducationDocuments = $15 
-                    WHERE Id = $16 RETURNING *`, 
+                    `UPDATE employees SET 
+                        employee_id = $1,
+                        full_name = $2, 
+                        phone = $3, 
+                        birth_date = $4, 
+                        gender = $5, 
+                        inn = $6, 
+                        position = $7,
+                        updated_at = CURRENT_TIMESTAMP
+                    WHERE id = $8 RETURNING *`, 
                     [
-                        employeeid, fullname, email, phone, birthdate, gender, 
-                        passportnumber, issuingauthority, issuedate, passportcopy, 
-                        inn, position, workbook, photo, educationdocuments, id
+                        employee_id, full_name, phone, birth_date, 
+                        gender, inn, position, id
                     ]
                 );
                 return result.rows[0];
@@ -155,9 +125,7 @@ class EmployeeController {
                 return res.status(404).json({ message: 'Employee not found' });
             }
             
-            // Не возвращаем пароль в ответе
-            const { PasswordHash, ...employeeData } = updatedEmployee;
-            res.json(employeeData);
+            res.json(updatedEmployee);
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: error.message });
@@ -170,7 +138,7 @@ class EmployeeController {
             
             const { data: deletedEmployee, error } = useFetch(async () => {
                 const result = await db.query(
-                    'DELETE FROM Employee WHERE Id = $1 RETURNING *', 
+                    'DELETE FROM employees WHERE id = $1 RETURNING *', 
                     [id]
                 );
                 return result.rows[0];
@@ -184,39 +152,30 @@ class EmployeeController {
                 return res.status(404).json({ message: 'Employee not found' });
             }
             
-            // Не возвращаем пароль в ответе
-            const { PasswordHash, ...employeeData } = deletedEmployee;
-            res.json(employeeData);
+            res.json(deletedEmployee);
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: error.message });
         }
     }
 
-    async updateEmployeePassword(req, res) {
+    async getEmployeeDocuments(req, res) {
         try {
-            const { id, newPasswordHash } = req.body;
+            const employeeId = req.params.employeeId;
             
-            const { data: updatedEmployee, error } = useFetch(async () => {
+            const { data: documents, error } = useFetch(async () => {
                 const result = await db.query(
-                    `UPDATE Employee SET 
-                        PasswordHash = $1 
-                    WHERE Id = $2 
-                    RETURNING Id, EmployeeId, FullName, Email, Position`, 
-                    [newPasswordHash, id]
+                    'SELECT * FROM employee_documents WHERE employee_id = $1',
+                    [employeeId]
                 );
-                return result.rows[0];
+                return result.rows;
             });
 
             if (error) {
                 return res.status(500).json({ error: error.message });
             }
 
-            if (!updatedEmployee) {
-                return res.status(404).json({ message: 'Employee not found' });
-            }
-            
-            res.json(updatedEmployee);
+            res.json(documents);
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: error.message });

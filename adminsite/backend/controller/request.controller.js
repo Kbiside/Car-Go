@@ -5,42 +5,44 @@ class RequestController {
     async createRequest(req, res) {
         try {
             const { 
-                employeeid,
-                clientid,
-                carid,
-                cost,
-                startdate,
-                enddate,
-                childseat,
-                comment
+                employee_id,
+                client_id,
+                car_id,
+                rental_price_id,
+                start_date,
+                end_date,
+                child_seat,
+                comment,
+                total_cost,
+                status
             } = req.body;
             
             const { data: newRequest, error } = useFetch(async () => {
                 // Проверяем доступность автомобиля
                 const carCheck = await db.query(
-                    'SELECT IsAvailable FROM Car WHERE Id = $1',
-                    [carid]
+                    'SELECT is_available FROM cars WHERE id = $1',
+                    [car_id]
                 );
                 
-                if (carCheck.rows.length === 0 || !carCheck.rows[0].isavailable) {
+                if (carCheck.rows.length === 0 || !carCheck.rows[0].is_available) {
                     throw new Error('Car is not available');
                 }
 
                 const result = await db.query(
-                    `INSERT INTO Request (
-                        EmployeeId, ClientId, CarId, Cost, 
-                        StartDate, EndDate, ChildSeat, Comment
-                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`, 
+                    `INSERT INTO requests (
+                        employee_id, client_id, car_id, rental_price_id,
+                        start_date, end_date, child_seat, comment, total_cost, status
+                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`, 
                     [
-                        employeeid, clientid, carid, cost,
-                        startdate, enddate, childseat, comment
+                        employee_id, client_id, car_id, rental_price_id,
+                        start_date, end_date, child_seat, comment, total_cost, status || 'pending'
                     ]
                 );
 
                 // Помечаем автомобиль как недоступный
                 await db.query(
-                    'UPDATE Car SET IsAvailable = false WHERE Id = $1',
-                    [carid]
+                    'UPDATE cars SET is_available = false WHERE id = $1',
+                    [car_id]
                 );
 
                 return result.rows[0];
@@ -62,14 +64,14 @@ class RequestController {
             const { data: requests, error } = useFetch(async () => {
                 const result = await db.query(`
                     SELECT r.*, 
-                           c.FullName as ClientName,
-                           e.FullName as EmployeeName,
-                           car.Brand as CarBrand,
-                           car.Model as CarModel
-                    FROM Request r
-                    JOIN Client c ON r.ClientId = c.Id
-                    JOIN Employee e ON r.EmployeeId = e.Id
-                    JOIN Car car ON r.CarId = car.Id
+                           c.full_name as client_name,
+                           e.full_name as employee_name,
+                           car.brand as car_brand,
+                           car.model as car_model
+                    FROM requests r
+                    JOIN clients c ON r.client_id = c.id
+                    JOIN employees e ON r.employee_id = e.id
+                    JOIN cars car ON r.car_id = car.id
                 `);
                 return result.rows;
             });
@@ -92,15 +94,15 @@ class RequestController {
             const { data: request, error } = useFetch(async () => {
                 const result = await db.query(`
                     SELECT r.*, 
-                           c.FullName as ClientName,
-                           e.FullName as EmployeeName,
-                           car.Brand as CarBrand,
-                           car.Model as CarModel
-                    FROM Request r
-                    JOIN Client c ON r.ClientId = c.Id
-                    JOIN Employee e ON r.EmployeeId = e.Id
-                    JOIN Car car ON r.CarId = car.Id
-                    WHERE r.Id = $1
+                           c.full_name as client_name,
+                           e.full_name as employee_name,
+                           car.brand as car_brand,
+                           car.model as car_model
+                    FROM requests r
+                    JOIN clients c ON r.client_id = c.id
+                    JOIN employees e ON r.employee_id = e.id
+                    JOIN cars car ON r.car_id = car.id
+                    WHERE r.id = $1
                 `, [id]);
                 return result.rows[0];
             });
@@ -124,20 +126,22 @@ class RequestController {
         try {
             const { 
                 id,
-                employeeid,
-                clientid,
-                carid,
-                cost,
-                startdate,
-                enddate,
-                childseat,
-                comment
+                employee_id,
+                client_id,
+                car_id,
+                rental_price_id,
+                start_date,
+                end_date,
+                child_seat,
+                comment,
+                total_cost,
+                status
             } = req.body;
             
             const { data: updatedRequest, error } = useFetch(async () => {
-                // Получаем текущий запрос для проверки carid
+                // Получаем текущий запрос для проверки car_id
                 const currentRequest = await db.query(
-                    'SELECT CarId FROM Request WHERE Id = $1',
+                    'SELECT car_id FROM requests WHERE id = $1',
                     [id]
                 );
 
@@ -145,25 +149,25 @@ class RequestController {
                     throw new Error('Request not found');
                 }
 
-                const oldCarId = currentRequest.rows[0].carid;
+                const oldCarId = currentRequest.rows[0].car_id;
                 let carUpdateQueries = [];
 
                 // Если изменился автомобиль, обновляем доступность
-                if (oldCarId !== carid) {
+                if (oldCarId !== car_id) {
                     // Проверяем новый автомобиль
                     const newCarCheck = await db.query(
-                        'SELECT IsAvailable FROM Car WHERE Id = $1',
-                        [carid]
+                        'SELECT is_available FROM cars WHERE id = $1',
+                        [car_id]
                     );
                     
-                    if (newCarCheck.rows.length === 0 || !newCarCheck.rows[0].isavailable) {
+                    if (newCarCheck.rows.length === 0 || !newCarCheck.rows[0].is_available) {
                         throw new Error('New car is not available');
                     }
 
                     // Освобождаем старый автомобиль
                     carUpdateQueries.push(
                         db.query(
-                            'UPDATE Car SET IsAvailable = true WHERE Id = $1',
+                            'UPDATE cars SET is_available = true WHERE id = $1',
                             [oldCarId]
                         )
                     );
@@ -171,26 +175,30 @@ class RequestController {
                     // Занимаем новый автомобиль
                     carUpdateQueries.push(
                         db.query(
-                            'UPDATE Car SET IsAvailable = false WHERE Id = $1',
-                            [carid]
+                            'UPDATE cars SET is_available = false WHERE id = $1',
+                            [car_id]
                         )
                     );
                 }
 
                 const result = await db.query(
-                    `UPDATE Request SET 
-                        EmployeeId = $1, 
-                        ClientId = $2, 
-                        CarId = $3, 
-                        Cost = $4, 
-                        StartDate = $5, 
-                        EndDate = $6, 
-                        ChildSeat = $7, 
-                        Comment = $8
-                    WHERE Id = $9 RETURNING *`, 
+                    `UPDATE requests SET 
+                        employee_id = $1, 
+                        client_id = $2, 
+                        car_id = $3, 
+                        rental_price_id = $4,
+                        start_date = $5, 
+                        end_date = $6, 
+                        child_seat = $7, 
+                        comment = $8,
+                        total_cost = $9,
+                        status = $10,
+                        updated_at = CURRENT_TIMESTAMP
+                    WHERE id = $11 RETURNING *`, 
                     [
-                        employeeid, clientid, carid, cost,
-                        startdate, enddate, childseat, comment, id
+                        employee_id, client_id, car_id, rental_price_id,
+                        start_date, end_date, child_seat, comment, 
+                        total_cost, status, id
                     ]
                 );
 
@@ -222,7 +230,7 @@ class RequestController {
             const { data: deletedRequest, error } = useFetch(async () => {
                 // Получаем запрос для освобождения автомобиля
                 const request = await db.query(
-                    'SELECT CarId FROM Request WHERE Id = $1',
+                    'SELECT car_id FROM requests WHERE id = $1',
                     [id]
                 );
 
@@ -230,17 +238,17 @@ class RequestController {
                     throw new Error('Request not found');
                 }
 
-                const carId = request.rows[0].carid;
+                const carId = request.rows[0].car_id;
 
                 // Удаляем запрос
                 const result = await db.query(
-                    'DELETE FROM Request WHERE Id = $1 RETURNING *',
+                    'DELETE FROM requests WHERE id = $1 RETURNING *',
                     [id]
                 );
 
                 // Освобождаем автомобиль
                 await db.query(
-                    'UPDATE Car SET IsAvailable = true WHERE Id = $1',
+                    'UPDATE cars SET is_available = true WHERE id = $1',
                     [carId]
                 );
 
@@ -269,12 +277,12 @@ class RequestController {
             const { data: requests, error } = useFetch(async () => {
                 const result = await db.query(`
                     SELECT r.*, 
-                           car.Brand as CarBrand,
-                           car.Model as CarModel
-                    FROM Request r
-                    JOIN Car car ON r.CarId = car.Id
-                    WHERE r.ClientId = $1
-                    ORDER BY r.StartDate DESC
+                           car.brand as car_brand,
+                           car.model as car_model
+                    FROM requests r
+                    JOIN cars car ON r.car_id = car.id
+                    WHERE r.client_id = $1
+                    ORDER BY r.start_date DESC
                 `, [clientId]);
                 return result.rows;
             });
@@ -297,11 +305,11 @@ class RequestController {
             const { data: requests, error } = useFetch(async () => {
                 const result = await db.query(`
                     SELECT r.*, 
-                           c.FullName as ClientName
-                    FROM Request r
-                    JOIN Client c ON r.ClientId = c.Id
-                    WHERE r.CarId = $1
-                    ORDER BY r.StartDate DESC
+                           c.full_name as client_name
+                    FROM requests r
+                    JOIN clients c ON r.client_id = c.id
+                    WHERE r.car_id = $1
+                    ORDER BY r.start_date DESC
                 `, [carId]);
                 return result.rows;
             });

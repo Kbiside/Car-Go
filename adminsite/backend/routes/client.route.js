@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const clientController = require('../controllers/clientController');
+const authMiddleware = require('../middlewares/authMiddleware');
 
-// Маршруты для работы с клиентами
-router.post('/clients', clientController.createClient);
-router.get('/clients', clientController.getClients);
-router.get('/clients/:id', clientController.getOneClient);
-router.put('/clients/:id', clientController.updateClient);
-router.delete('/clients/:id', clientController.deleteClient);
+router.post('/clients', authMiddleware, clientController.createClient);
+router.get('/clients', authMiddleware, clientController.getClients);
+router.get('/clients/:id', authMiddleware, clientController.getOneClient);
+router.get('/clients/:clientId/documents', authMiddleware, clientController.getClientDocuments);
+router.put('/clients/:id', authMiddleware, clientController.updateClient);
+router.delete('/clients/:id', authMiddleware, clientController.deleteClient);
 
 module.exports = router;
