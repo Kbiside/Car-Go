@@ -3,233 +3,148 @@ import {
   Button,
   Stack,
   Title,
-  FileInput,
   Group,
   Container,
   SimpleGrid,
-  Text,
-  Grid,
   Select,
-  Textarea,
+  Paper,
+  rem,
 } from '@mantine/core';
-import { IconUpload } from '@tabler/icons-react';
-import { useState } from 'react';
+import { IconCalendar, IconTrash, IconUser, IconMail, IconPhone, IconId } from '@tabler/icons-react';
+import { DatePickerInput } from '@mantine/dates';
+import { useForm } from '@mantine/form';
+import { IMaskInput } from 'react-imask';
 
 export function ClientAddPage() {
-  const [formValues, setFormValues] = useState({
-    clientId: '',
-    fullName: '',
-    email: '',
-    phone: '',
-    birthDate: '',
-    gender: '',
-    passportNumber: '',
-    issueDate: '',
-    issuingAuthority: '',
-    inn: '',
-    position: '',
-    comment: '',
-    passportFile: null,
-    driverLicense: null,
+  const form = useForm({
+    initialValues: {
+      userId: '',
+      fullName: '',
+      email: '',
+      phone: '',
+      role: '',
+      birthDate: null as Date | null,
+      registrationDate: null as Date | null,
+    },
+
+    validate: {
+      email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Некорректный email'),
+      phone: (value) => (value.replace(/\D/g, '').length === 11 ? null : 'Некорректный номер'),
+    },
   });
 
-  const handleChange = (field: string, value: any) => {
-    setFormValues(prev => ({ ...prev, [field]: value }));
+  const handleSubmit = (values: typeof form.values) => {
+    console.log(values);
+    // Обработка отправки формы
   };
 
-  const RequiredStar = ({ filled }: { filled: boolean }) => (
-    <Text span c="red" ml={4} style={{ visibility: filled ? 'hidden' : 'visible' }}>
-      *
-    </Text>
-  );
+  const resetForm = () => {
+    form.reset();
+  };
 
   return (
-    <Container size="lg">
-      <Title order={2} mb="md">Добавить клиента</Title>
-      <Stack>
-        <Title order={4}>Основная информация</Title>
-        
-        <SimpleGrid cols={2} spacing="md">
-          <TextInput 
-            label={
-              <>
-                ID клиента
-                <RequiredStar filled={!!formValues.clientId} />
-              </>
-            }
-            placeholder="12345"
-            value={formValues.clientId}
-            onChange={(e) => handleChange('clientId', e.target.value)}
-          />
-          <TextInput 
-            label={
-              <>
-                ФИО
-                <RequiredStar filled={!!formValues.fullName} />
-              </>
-            }
-            placeholder="Введите ФИО"
-            value={formValues.fullName}
-            onChange={(e) => handleChange('fullName', e.target.value)}
-          />
-          <TextInput 
-            label={
-              <>
-                Email
-                <RequiredStar filled={!!formValues.email} />
-              </>
-            }
-            placeholder="Введите email"
-            value={formValues.email}
-            onChange={(e) => handleChange('email', e.target.value)}
-          />
-          <TextInput 
-            label={
-              <>
-                Номер телефона
-                <RequiredStar filled={!!formValues.phone} />
-              </>
-            }
-            placeholder="Введите номер"
-            value={formValues.phone}
-            onChange={(e) => handleChange('phone', e.target.value)}
-          />
-          <TextInput 
-            label={
-              <>
-                Дата рождения
-                <RequiredStar filled={!!formValues.birthDate} />
-              </>
-            }
-            placeholder="ДД/ММ/ГГГГ"
-            value={formValues.birthDate}
-            onChange={(e) => handleChange('birthDate', e.target.value)}
-          />
-          <Select
-            label={
-              <>
-                Пол
-                <RequiredStar filled={!!formValues.gender} />
-              </>
-            }
-            placeholder="Выберите пол"
-            data={[
-              { value: 'male', label: 'м' },
-              { value: 'female', label: 'ж' },
-            ]}
-            value={formValues.gender}
-            onChange={(value) => handleChange('gender', value)}
-          />
-        </SimpleGrid>
+    <Container size="lg" py="xl">
+      <Title order={2} mb="xl">Добавить нового клиента</Title>
+      
+      <form onSubmit={form.onSubmit(handleSubmit)}>
+        <Stack gap="xl">
+          <Paper withBorder p="md" radius="md">
+            <Title order={4} mb="md">Основная информация</Title>
+            
+            <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+              <TextInput 
+                label="ID клиента"
+                placeholder="Введите уникальный ID"
+                leftSection={<IconId size={18} />}
+                required
+                {...form.getInputProps('userId')}
+              />
+              
+              <TextInput 
+                label="ФИО"
+                placeholder="Введите полное имя"
+                leftSection={<IconUser size={18} />}
+                required
+                {...form.getInputProps('fullName')}
+              />
+              
+              <TextInput 
+                label="Email"
+                placeholder="example@mail.com"
+                leftSection={<IconMail size={18} />}
+                required
+                {...form.getInputProps('email')}
+              />
+              
+              <TextInput 
+                label="Телефон"
+                placeholder="+7 (___) ___-__-__"
+                leftSection={<IconPhone size={18} />}
+                component={IMaskInput}
+                required
+                {...form.getInputProps('phone')}
+              />
+              
+              <Select
+                label="Роль"
+                placeholder="Выберите роль"
+                data={[
+                  { value: 'vip', label: 'VIP клиент' },
+                  { value: 'regular', label: 'Постоянный клиент' },
+                  { value: 'new', label: 'Новый клиент' },
+                ]}
+                required
+                {...form.getInputProps('role')}
+              />
+            </SimpleGrid>
+          </Paper>
 
-        <Title order={4}>Документы клиента</Title>
-        
-        <Grid gutter="md">
-          <Grid.Col span={6}>
-            <TextInput 
-              label={
-                <>
-                  Серия и номер паспорта
-                  <RequiredStar filled={!!formValues.passportNumber} />
-                </>
-              }
-              placeholder="123456789"
-              value={formValues.passportNumber}
-              onChange={(e) => handleChange('passportNumber', e.target.value)}
-            />
-          </Grid.Col>
-          <Grid.Col span={6}>
-            <TextInput 
-              label={
-                <>
-                  Дата выдачи
-                  <RequiredStar filled={!!formValues.issueDate} />
-                </>
-              }
-              placeholder="ДД/ММ/ГГГГ"
-              value={formValues.issueDate}
-              onChange={(e) => handleChange('issueDate', e.target.value)}
-            />
-          </Grid.Col>
-          <Grid.Col span={6}>
-            <TextInput 
-              label={
-                <>
-                  Выдавший орган
-                  <RequiredStar filled={!!formValues.issuingAuthority} />
-                </>
-              }
-              placeholder="Введите"
-              value={formValues.issuingAuthority}
-              onChange={(e) => handleChange('issuingAuthority', e.target.value)}
-            />
-          </Grid.Col>
-          <Grid.Col span={6}>
-            <TextInput 
-              label={
-                <>
-                  ИНН
-                  <RequiredStar filled={!!formValues.inn} />
-                </>
-              }
-              placeholder="123456789"
-              value={formValues.inn}
-              onChange={(e) => handleChange('inn', e.target.value)}
-            />
-          </Grid.Col>
-          <Grid.Col span={12}>
-            <TextInput 
-              label="Должность" 
-              placeholder="Введите должность сотрудника" 
-              value={formValues.position}
-              onChange={(e) => handleChange('position', e.target.value)}
-            />
-          </Grid.Col>
-          <Grid.Col span={12}>
-            <Textarea 
-              label="Комментарий" 
-              placeholder="Введите комментарий (при необходимости)" 
-              value={formValues.comment}
-              onChange={(e) => handleChange('comment', e.target.value)}
-            />
-          </Grid.Col>
-          <Grid.Col span={6}>
-            <FileInput 
-              label={
-                <>
-                  Паспорт клиента
-                  <RequiredStar filled={!!formValues.passportFile} />
-                </>
-              }
-              placeholder="Загрузить файл"
-              value={formValues.passportFile}
-              onChange={(value) => handleChange('passportFile', value)}
-              rightSection={<IconUpload size={18} />}
-              rightSectionWidth={40}
-            />
-          </Grid.Col>
-          <Grid.Col span={6}>
-            <FileInput 
-              label={
-                <>
-                  Водительское удостоверение
-                  <RequiredStar filled={!!formValues.driverLicense} />
-                </>
-              }
-              placeholder="Загрузить файл"
-              value={formValues.driverLicense}
-              onChange={(value) => handleChange('driverLicense', value)}
-              rightSection={<IconUpload size={18} />}
-              rightSectionWidth={40}
-            />
-          </Grid.Col>
-        </Grid>
+          <Paper withBorder p="md" radius="md">
+            <Title order={4} mb="md">Дополнительная информация</Title>
+            
+            <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+              <DatePickerInput
+                label="Дата рождения"
+                placeholder="Выберите дату"
+                leftSection={<IconCalendar size={18} />}
+                valueFormat="DD.MM.YYYY"
+                maxDate={new Date()}
+                clearable
+                {...form.getInputProps('birthDate')}
+              />
+              
+              <DatePickerInput
+                label="Дата регистрации"
+                placeholder="Выберите дату"
+                leftSection={<IconCalendar size={18} />}
+                valueFormat="DD.MM.YYYY"
+                maxDate={new Date()}
+                clearable
+                {...form.getInputProps('registrationDate')}
+              />
+            </SimpleGrid>
+          </Paper>
 
-        <Group mt="md">
-          <Button variant="outline">Очистить</Button>
-          <Button color="blue">Сохранить</Button>
-        </Group>
-      </Stack>
+          <Group justify="flex-end" mt="md">
+            <Button 
+              variant="outline" 
+              color="red" 
+              leftSection={<IconTrash size={rem(18)} />}
+              onClick={resetForm}
+              type="button"
+            >
+              Очистить форму
+            </Button>
+            <Button 
+              color="blue" 
+              size="md"
+              type="submit"
+            >
+              Сохранить клиента
+            </Button>
+          </Group>
+        </Stack>
+      </form>
     </Container>
   );
 }

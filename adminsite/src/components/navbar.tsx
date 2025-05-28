@@ -1,12 +1,14 @@
-import { NavLink, ScrollArea, Box } from '@mantine/core';
+import { NavLink, ScrollArea, Box, rem } from '@mantine/core';
 import {
   IconUsers,
-  IconCar,
   IconBriefcase,
-  IconClipboardList,
   IconMessage,
+  IconShoppingCart, // Добавляем иконку для заказов
+  IconJacket,
+  IconCategory
 } from '@tabler/icons-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import classes from './css/Navbar.module.css';
 
 interface NavItem {
   icon: React.ComponentType<{ size: string }>;
@@ -20,15 +22,16 @@ export function Navbar() {
 
   const navItems: NavItem[] = [
     { icon: IconUsers, label: 'Клиенты', path: '/clients' },
-    { icon: IconCar, label: 'Автопарк', path: '/cars' },
+    { icon: IconJacket, label: 'Шубы', path: '/fur-coats' },
     { icon: IconBriefcase, label: 'Сотрудники', path: '/employees' },
-    { icon: IconClipboardList, label: 'Заказы', path: '/requests' },
+    { icon: IconShoppingCart, label: 'Заказы', path: '/orders' }, // Новый пункт для заказов
     { icon: IconMessage, label: 'Обратная связь', path: '/feedback' },
+    { icon: IconCategory, label: 'Категории', path: '/categories' },
   ];
 
   return (
-    <ScrollArea h={`calc(100vh - 60px)`}>
-      <Box p="sm">
+    <ScrollArea h={`calc(100vh - ${rem(60)})`} className={classes.scrollArea}>
+      <Box p="md" className={classes.navbarBox}>
         {navItems.map((item, index) => {
           const Icon = item.icon;
           return (
@@ -36,10 +39,16 @@ export function Navbar() {
               key={index}
               component="button"
               label={item.label}
-              leftSection={<Icon size="1rem" />}
+              leftSection={<Icon size="1.2rem" />}
               onClick={() => navigate(item.path)}
               active={location.pathname.startsWith(item.path)}
-              variant="light"
+              className={classes.navLink}
+              classNames={{
+                root: classes.navLinkRoot,
+                body: classes.navLinkBody,
+                label: classes.navLinkLabel,
+              }}
+              variant="subtle"
             />
           );
         })}

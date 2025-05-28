@@ -9,8 +9,13 @@ import {
   useMantineTheme,
   Modal,
   Text,
+  Box,
+  Divider,
+  Badge,
+  Anchor,
+  Image
 } from '@mantine/core';
-import { IconBell, IconPlus } from '@tabler/icons-react';
+import { IconBell, IconLogout, IconHome } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
@@ -30,6 +35,12 @@ export function Header({
   const navigate = useNavigate();
   const [opened, { open, close }] = useDisclosure(false);
 
+  // Цветовая схема мехового салона
+  const furColors = {
+    dark: '#8a6337',
+    darker: '#50381b',
+  };
+
   const handleLogout = () => {
     close();
     notifications.show({
@@ -37,13 +48,12 @@ export function Header({
       message: 'Вы успешно вышли из системы',
       color: 'green',
     });
-    // Здесь должна быть логика выхода
     navigate('/');
   };
 
   return (
     <>
-      <Group justify="space-between" h="100%" px="md">
+      <Group justify="space-between" h="100%" px="md" bg={theme.colors.gray[0]}>
         <Group>
           {/* Mobile burger button */}
           <Burger
@@ -53,6 +63,7 @@ export function Header({
             mr="xl"
             hiddenFrom="sm"
             aria-label="Toggle mobile navigation"
+            color={furColors.dark}
           />
 
           {/* Desktop burger button */}
@@ -63,30 +74,54 @@ export function Header({
             mr="xl"
             visibleFrom="sm"
             aria-label="Toggle desktop navigation"
+            color={furColors.dark}
           />
 
-          <Title
-            order={3}
-            style={{ cursor: 'pointer' }}
+          {/* Логотип и название с ссылкой */}
+          <Anchor 
+            underline="never" 
             onClick={() => navigate('/dashboard')}
+            style={{ display: 'flex', alignItems: 'center' }}
           >
-            Car&Go
-          </Title>
+            <Group gap="xs">
+              {/* Замените на ваш логотип */}
+              <Image
+                src="/Fur-coatsLogo.png" // Укажите правильный путь к логотипу
+                width={32}
+                height={32}
+                alt="Логотип Д&К"
+                fallbackSrc="https://placehold.co/32x32?text=Д&К"
+              />
+              <Box>
+                <Title order={3} c={furColors.darker}>
+                  Д&К
+                </Title>
+                <Text size="xs" c="dimmed">Дорого Красиво</Text>
+              </Box>
+            </Group>
+          </Anchor>
         </Group>
 
-        <Group>
-          <Button
-            leftSection={<IconPlus size="1rem" />}
-            variant="light"
-            onClick={() => navigate('/requests/add')}
-          >
-            Добавить заявку
-          </Button>
+        <Group gap="xl">
+          <Group gap={4}>
+            <Badge variant="filled" color={furColors.dark} radius="sm">
+              Системный администратор
+            </Badge>
+            <Divider orientation="vertical" />
+            <Text 
+              size="sm" 
+              c={furColors.darker} 
+              style={{ cursor: 'pointer' }}
+              onClick={open}
+            >
+              Logout
+            </Text>
+          </Group>
 
           <ActionIcon 
-            variant="default" 
+            variant="subtle" 
             size="lg"
-            onClick={() => navigate('/feedback')}
+            color={furColors.dark}
           >
             <IconBell size="1.1rem" />
           </ActionIcon>
@@ -96,17 +131,25 @@ export function Header({
               <Avatar
                 radius="xl"
                 style={{ cursor: 'pointer' }}
-                color={theme.primaryColor}
+                color={furColors.dark}
               />
             </Menu.Target>
 
             <Menu.Dropdown>
               <Menu.Label>Личный кабинет</Menu.Label>
-              <Menu.Item onClick={() => navigate('/employees/1')}>
-                Профиль
+              <Menu.Item 
+                leftSection={<IconHome size={14} />}
+                onClick={() => navigate('/dashboard')}
+              >
+                На главную
               </Menu.Item>
+              <Menu.Item>Профиль</Menu.Item>
               <Menu.Divider />
-              <Menu.Item color="red" onClick={open}>
+              <Menu.Item 
+                color="red" 
+                leftSection={<IconLogout size={14} />}
+                onClick={open}
+              >
                 Выйти
               </Menu.Item>
             </Menu.Dropdown>
@@ -121,7 +164,11 @@ export function Header({
           <Button variant="default" onClick={close}>
             Отмена
           </Button>
-          <Button color="red" onClick={handleLogout}>
+          <Button 
+            color="red" 
+            leftSection={<IconLogout size={18} />}
+            onClick={handleLogout}
+          >
             Выйти
           </Button>
         </Group>

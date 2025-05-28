@@ -8,21 +8,23 @@ import { AppLayout } from "./components/AppLayout.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
 import { DashboardPage } from "./pages/Dashboard.tsx";
 import { ClientAddPage } from "./pages/client/AddClient.tsx";
-import AddCarPage from "./pages/car/AddCar.tsx";
-import CarProfile from "./pages/car/Car.tsx";
+import { AddFurCoatPage } from './pages/fur-coats/AddFurCoat.tsx';
+import FurCoatProfile from "./pages/fur-coats/Fur-coats.tsx";
 import ClientsPage from "./pages/client/Client.tsx";
-import EmployeesPage from "./pages/sotr/sotr.tsx";
-import AddEmployee from "./pages/sotr/AddSotr.tsx";
-import VehiclesPage from "./pages/car/Vehicle.tsx";
+import EmployeesPage from "./pages/Employees/EmployeesPage.tsx";
+import AddEmployee from "./pages/Employees/AddEmployeePage.tsx";
+import FurCoatsPage from "./pages/fur-coats/FurCoatsPage.tsx";
 import ClientProfilePage from "./pages/client/ProfileClient.tsx";
-import EmployeeProfilePage from "./pages/sotr/sotrProfile.tsx";
-import CreateRequest from "./pages/Zayavki/AddZaya2.tsx";
-import RequestsPage from "./pages/Zayavki/Zaya.tsx";
-import OrderCardPage from "./pages/Zayavki/zayaProfile.tsx";
-import FeedbackPage from "./pages/sviaz/sviaz.tsx";
-import EditCarPage from "./pages/car/EditCar.tsx";
+import EmployeeProfilePage from "./pages/Employees/EmployeeProfilePage.tsx";
+import ReviewsManagement from "./pages/Reviews/ReviewsManagement.tsx";
+import EditFurCoatPage from "./pages/fur-coats/EditFurCoat.tsx";
 import EditClientPage from "./pages/client/EditClient.tsx";
-import EditEmployeePage from "./pages/sotr/sotrProfile.tsx";
+import EditEmployeePage from "./pages/Employees/EditEmployeePage.tsx";
+import OrdersManagementPage from "./pages/orders/OrdersManagementPage.tsx";
+import AddOrderPage from "./pages/orders/AddOrderPage.tsx";
+import OrderProfilePage from "./pages/orders/OrderProfilePage.tsx";
+import EditOrderPage from "./pages/orders/EditOrderPage.tsx";
+import CategoriesManagementPage from "./pages/categories/Categories.tsx";
 
 const router = createBrowserRouter([
   {
@@ -41,7 +43,7 @@ const router = createBrowserRouter([
       },
       {
         path: "feedback",
-        element: <FeedbackPage />,
+        element: <ReviewsManagement />,
         handle: { crumb: "Обратная связь" }
       },
       {
@@ -60,48 +62,31 @@ const router = createBrowserRouter([
             handle: { crumb: "Профиль клиента" }
           },
           { 
-            path: "edit", 
+            path: "edit/:id", 
             element: <EditClientPage />,
             handle: { crumb: "Редактировать профиль клиента" }
           }
         ]
       },
       {
-        path: "cars",
-        handle: { crumb: "Автопарк" },
+        path: "fur-coats",
+        handle: { crumb: "Шубы" },
         children: [
-          { index: true, element: <VehiclesPage /> },
+          { index: true, element: <FurCoatsPage /> },
           { 
             path: "add", 
-            element: <AddCarPage />,
-            handle: { crumb: "Добавить авто" }
+            element: <AddFurCoatPage />,
+            handle: { crumb: "Добавить шубу" }
           },
           { 
             path: ":id", 
-            element: <CarProfile />,
-            handle: { crumb: "Карточка авто" }
+            element: <FurCoatProfile />,
+            handle: { crumb: "Карточка шубы" }
           },
           { 
-            path: "edit", 
-            element: <EditCarPage />,
-            handle: { crumb: "Редактировать авто" }
-          }
-        ]
-      },
-      {
-        path: "requests",
-        handle: { crumb: "Заявки" },
-        children: [
-          { index: true, element: <RequestsPage /> },
-          { 
-            path: "add", 
-            element: <CreateRequest />,
-            handle: { crumb: "Создать заявку" }
-          },
-          { 
-            path: ":id", 
-            element: <OrderCardPage />,
-            handle: { crumb: "Карточка заявки" }
+            path: "edit/:id", 
+            element: <EditFurCoatPage />,
+            handle: { crumb: "Редактировать шубу" }
           }
         ]
       },
@@ -121,12 +106,71 @@ const router = createBrowserRouter([
             handle: { crumb: "Профиль сотрудника" }
           },
           { 
-            path: "edit", 
+            path: "edit/:id", 
             element: <EditEmployeePage />,
             handle: { crumb: "Редактировать профиль сотрудника" }
           }
         ]
       },
+      {
+        path: "orders",
+        handle: { crumb: "Заказы" },
+        children: [
+          { 
+            index: true, 
+            element: <OrdersManagementPage />,
+            handle: { crumb: "Управление заказами" }
+          },
+          { 
+            path: "add", 
+            element: <AddOrderPage />,
+            handle: { crumb: "Создать заказ" }
+          },
+          { 
+            path: ":id", 
+            element: <OrderProfilePage />,
+            handle: { crumb: "Карточка заказа" }
+          },
+          { 
+            path: "edit/:id", 
+            element: <EditOrderPage />,
+            handle: { crumb: "Редактировать заказ" }
+          }
+        ]
+      },
+      {
+            path: "employees",
+            handle: { crumb: "Сотрудники" },
+            children: [
+              { index: true, element: <EmployeesPage /> },
+              { 
+                path: "add", 
+                element: <EmployeesPage />,
+                handle: { crumb: "Добавить сотрудника" }
+              },
+              { 
+                path: ":id", 
+                element: <EmployeeProfilePage />,
+                handle: { crumb: "Профиль сотрудника" }
+              },
+              { 
+                path: "edit/:id", 
+                element: <EditEmployeePage />,
+                handle: { crumb: "Редактировать сотрудника" }
+              }
+            ]
+        },
+        {
+        path: "categories",
+        handle: { crumb: "Категории" },
+        children: [
+          { 
+            index: true, 
+            element: <CategoriesManagementPage />,
+            handle: { crumb: "Управление категориями" }
+          }
+        ]
+      }
     ]
   },
   { 

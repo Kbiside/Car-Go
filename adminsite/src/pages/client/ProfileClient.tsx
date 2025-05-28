@@ -1,166 +1,107 @@
 import { 
   Title, 
   Text, 
-  Table, 
   Button, 
   Group, 
   Stack, 
   Container,
   Paper,
-  Box,
-  Anchor,
-  ActionIcon,
-  Modal,
-  Image
+  Badge,
+  Avatar
 } from '@mantine/core';
-import { IconEdit, IconLicense, IconId, IconDownload } from '@tabler/icons-react';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Добавляем импорт для навигации
+import { IconEdit, IconCalendar, IconMail, IconPhone } from '@tabler/icons-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function ClientProfilePage() {
-  const [openedDoc, setOpenedDoc] = useState<string | null>(null);
-  const navigate = useNavigate(); // Инициализируем навигацию
+  const navigate = useNavigate();
   
-  // Данные клиента (включая комментарий)
+  // Данные клиента
   const clientData = {
-    id: '937601', // Добавляем id клиента для маршрутизации
+    id: '937601',
     fullName: 'Смирнова Анна Сергеевна',
     clientId: 'ID 937601',
-    phone: '89510833438',
+    email: 'anna.smirnova@example.com',
+    phone: '+7 (951) 083-34-38',
     birthDate: '16.07.1989',
-    comment: 'Клиент предпочитает электромобили. Важный клиент с 2015 года.'
+    registrationDate: '15.04.2015',
+    role: 'vip',
+    comment: 'Постоянная клиентка с 2015 года. Предпочитает изделия из норки. Размер 48. Любимые цвета: черный, бежевый.',
+    purchases: 12,
+    totalSpent: 450000
   };
 
-  // Данные документов
-  const documents = [
-    {
-      type: 'Паспорт',
-      icon: <IconId size="1.2rem" />,
-      number: '1234 567890',
-      issueDate: '23.08.2011',
-      previewUrl: '/api/documents/passport-preview.jpg',
-      fileUrl: '/api/documents/passport.pdf'
-    },
-    {
-      type: 'Водительское удостоверение',
-      icon: <IconLicense size="1.2rem" />,
-      number: 'ВУ 123456',
-      issueDate: '15.05.2015',
-      previewUrl: '/api/documents/license-preview.jpg',
-      fileUrl: '/api/documents/license.pdf'
-    },
-  ];
-
-  const handleViewDoc = (docType: string) => {
-    setOpenedDoc(docType);
-  };
-
-  const handleDownloadDoc = (docType: string, event: React.MouseEvent) => {
-    event.stopPropagation();
-    console.log(`Скачивание ${docType}`);
-    const link = document.createElement('a');
-    link.href = `#${docType.toLowerCase().replace(' ', '-')}`;
-    link.download = `${docType}_${clientData.fullName}.pdf`;
-    link.click();
+  const getRoleBadge = (role: string) => {
+    const colors = {
+      'vip': 'violet',
+      'regular': 'blue',
+      'new': 'green'
+    };
+    const labels = {
+      'vip': 'VIP клиент',
+      'regular': 'Постоянный клиент',
+      'new': 'Новый клиент'
+    };
+    return <Badge color={colors[role as keyof typeof colors]} size="lg">{labels[role as keyof typeof labels]}</Badge>;
   };
 
   const handleEditClick = () => {
-    navigate(`/clients/edit`); 
+    navigate(`/clients/edit/${clientData.id}`); 
   };
 
   return (
     <Container size="lg" py="md">
-      <Modal
-        opened={openedDoc !== null}
-        onClose={() => setOpenedDoc(null)}
-        title={`Просмотр документа: ${openedDoc}`}
-        size="xl"
-      >
-        {openedDoc && (
-          <Image
-            src={documents.find(d => d.type === openedDoc)?.previewUrl}
-            alt={`Превью ${openedDoc}`}
-            fit="contain"
-            style={{ maxHeight: '70vh' }}
-          />
-        )}
-      </Modal>
-
       <Stack gap="xl">
         <Title order={1} ta="center">
           Профиль клиента
         </Title>
 
+        {/* Основная информация */}
         <Paper p="md" shadow="sm" radius="md">
-          <Stack gap="xs" align="center">
-            <Text size="xl" fw={500}>
-              {clientData.fullName}
-            </Text>
-            <Text size="md" c="dimmed">
-              {clientData.clientId}
-            </Text>
-            <Text size="md">
-              Телефон: {clientData.phone}
-            </Text>
-            <Text size="md">
-              Дата рождения: {clientData.birthDate}
-            </Text>
-          </Stack>
+          <Group align="flex-start" gap="xl">
+            <Avatar size={120} color="blue" radius="xl">
+              {clientData.fullName.split(' ').map(n => n[0]).join('')}
+            </Avatar>
+
+            <Stack gap="sm">
+              <Group gap="sm" align="center">
+                <Title order={2}>{clientData.fullName}</Title>
+                {getRoleBadge(clientData.role)}
+              </Group>
+
+              <Text size="md" c="dimmed">
+                {clientData.clientId}
+              </Text>
+
+              <Group gap="xl" mt="sm">
+                <Stack gap={4}>
+                  <Group gap="sm">
+                    <IconPhone size="1.2rem" />
+                    <Text>{clientData.phone}</Text>
+                  </Group>
+                  <Group gap="sm">
+                    <IconMail size="1.2rem" />
+                    <Text>{clientData.email}</Text>
+                  </Group>
+                </Stack>
+
+                <Stack gap={4}>
+                  <Group gap="sm">
+                    <IconCalendar size="1.2rem" />
+                    <Text>Дата рождения: {clientData.birthDate}</Text>
+                  </Group>
+                  <Group gap="sm">
+                    <IconCalendar size="1.2rem" />
+                    <Text>Клиент с: {clientData.registrationDate}</Text>
+                  </Group>
+                </Stack>
+              </Group>
+            </Stack>
+          </Group>
         </Paper>
 
-        <Box>
-          <Title order={2} mb="sm">
-            Документы клиента
-          </Title>
-          
-          <Table
-            striped
-            highlightOnHover
-            withColumnBorders
-            horizontalSpacing="md"
-            verticalSpacing="sm"
-          >
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th style={{ width: '40px' }}></Table.Th>
-                <Table.Th>Тип документа</Table.Th>
-                <Table.Th>Серия и номер</Table.Th>
-                <Table.Th>Дата выдачи</Table.Th>
-                <Table.Th style={{ width: '60px' }}></Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              {documents.map((doc, index) => (
-                <Table.Tr key={index} style={{ cursor: 'pointer' }} onClick={() => handleViewDoc(doc.type)}>
-                  <Table.Td>{doc.icon}</Table.Td>
-                  <Table.Td>
-                    <Anchor component="span" c="blue" underline="hover">
-                      {doc.type}
-                    </Anchor>
-                  </Table.Td>
-                  <Table.Td>{doc.number}</Table.Td>
-                  <Table.Td>{doc.issueDate}</Table.Td>
-                  <Table.Td>
-                    <ActionIcon 
-                      variant="subtle" 
-                      color="green"
-                      onClick={(e) => handleDownloadDoc(doc.type, e)}
-                      title="Скачать документ"
-                    >
-                      <IconDownload size="1rem" />
-                    </ActionIcon>
-                  </Table.Td>
-                </Table.Tr>
-              ))}
-            </Table.Tbody>
-          </Table>
-        </Box>
-
-        {/* Блок комментариев (только для чтения) */}
+        {/* Комментарии */}
         <Paper p="md" shadow="sm" radius="md">
-          <Title order={3} mb="sm">
-            Комментарии о клиенте
-          </Title>
+          <Title order={3} mb="sm">Комментарии и предпочтения</Title>
           <Text size="md" style={{ whiteSpace: 'pre-wrap' }}>
             {clientData.comment}
           </Text>
@@ -169,8 +110,8 @@ export default function ClientProfilePage() {
         <Group justify="flex-end">
           <Button 
             leftSection={<IconEdit size="1rem" />} 
-            variant="outline"
-            onClick={handleEditClick} // Добавляем обработчик клика
+            onClick={handleEditClick} // Используем объявленный обработчик
+            color="blue"
           >
             Редактировать профиль
           </Button>
